@@ -1,9 +1,12 @@
 import { z } from 'zod/v4';
+import { NodeEnvironment } from '@/core/enums';
 
 export const envSchema = z
   .object({
     // Server
-    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+    NODE_ENV: z
+      .enum(Object.values(NodeEnvironment) as [NodeEnvironment, ...NodeEnvironment[]])
+      .default(NodeEnvironment.DEVELOPMENT),
     PORT: z.coerce.number().default(3398),
 
     // Database
@@ -12,6 +15,9 @@ export const envSchema = z
     DB_USERNAME: z.string().default('postgres'),
     DB_PASSWORD: z.string().default('Password123'),
     DB_NAME: z.string().default('products-service'),
+
+    // Swagger
+    SWAGGER_PATH: z.string().default('api/docs'),
   })
   .transform((env) => ({
     ...env,
