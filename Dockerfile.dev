@@ -1,0 +1,16 @@
+# Development Dockerfile with Hot Reload
+FROM node:20-alpine AS development
+
+RUN corepack enable
+
+WORKDIR /app
+COPY package.json yarn.lock ./
+
+RUN --mount=type=cache,target=/root/.cache/yarn \
+  yarn install --frozen-lockfile
+
+RUN chown -R node:node /app
+
+USER node
+EXPOSE 3398
+CMD ["yarn", "start:dev"]

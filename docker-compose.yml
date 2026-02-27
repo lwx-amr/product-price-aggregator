@@ -1,0 +1,52 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: products-postgres-service
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-Password123}
+      POSTGRES_DB: ${DB_NAME:-products-service}
+    volumes:
+      - products-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-products-service}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Application (Development Mode with Hot Reload)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: products-service
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3398}:3398"
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./tsconfig.build.json:/app/tsconfig.build.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./package.json:/app/package.json
+      - ./yarn.lock:/app/yarn.lock
+      - app-node-modules:/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "yarn install && yarn start:dev"
+
+volumes:
+  products-postgres-data:
+  app-node-modules:
