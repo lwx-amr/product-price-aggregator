@@ -1,7 +1,8 @@
+import { validate } from '@config';
+import { PrismaModule } from '@modules/database/prisma.module';
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
-import { validate } from '@/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -11,6 +12,7 @@ import { AppService } from './app.service';
       isGlobal: true,
       validate,
     }),
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [

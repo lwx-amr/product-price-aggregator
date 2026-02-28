@@ -31,7 +31,11 @@
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@core/*": ["src/core/*"],
+      "@modules/*": ["src/modules/*"],
+      "@config": ["src/config/index.ts"],
+      "@module-options": ["src/module-options/index.ts"]
     }
   },
   "watchOptions": {

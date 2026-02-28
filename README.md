@@ -39,7 +39,13 @@ cp .env.example .env
 yarn docker:up
 ```
 
-4. Run the app in development mode:
+4. Run Prisma migrations to set up the database:
+
+```bash
+yarn prisma:migrate
+```
+
+5. Run the app in development mode:
 
 ```bash
 yarn start:dev
@@ -57,6 +63,9 @@ The app will be running on `http://localhost:3398`.
 | `yarn docker:build`    | Build containers                   |
 | `yarn docker:restart`  | Restart app container              |
 | `yarn docker:no-cache` | Rebuild containers without cache   |
+| `yarn prisma:migrate`  | Run Prisma migrations              |
+| `yarn prisma:generate` | Regenerate Prisma Client           |
+| `yarn prisma:studio`   | Open Prisma Studio (DB browser)    |
 
 ## Environment Variables
 
@@ -68,9 +77,70 @@ Swagger UI is available at `http://localhost:3398/api/docs` once the app is runn
 
 All API routes are prefixed with `/api/v1/`.
 
+## Database Schema
+
+```mermaid
+erDiagram
+    Provider {
+        int id PK
+        string name UK
+        string base_url
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
+
+    Product {
+        int id PK
+        string canonical_key UK
+        string name
+        string description
+        datetime created_at
+        datetime updated_at
+    }
+
+    ProviderProduct {
+        int id PK
+        int provider_id FK
+        int product_id FK
+        string external_id
+        decimal price
+        Currency currency
+        boolean availability
+        datetime source_last_updated
+        datetime fetched_at
+        boolean is_stale
+        datetime created_at
+        datetime updated_at
+    }
+
+    ProviderProductHistory {
+        int id PK
+        int provider_product_id FK
+        decimal price
+        decimal old_price
+        Currency currency
+        boolean availability
+        boolean old_availability
+        ChangeType change_type
+        datetime changed_at
+    }
+
+    Provider ||--o{ ProviderProduct : "has many"
+    Product ||--o{ ProviderProduct : "has many"
+    ProviderProduct ||--o{ ProviderProductHistory : "has many"
+```
+
+- **Provider** — external data source (e.g. Provider A, B, C). Holds the base URL and active status.
+- **Product** — canonical product identified by a unique `canonical_key`. Multiple providers can offer the same product.
+- **ProviderProduct** — a specific provider's current offer for a product (price, availability, currency). This is where we track freshness via `fetched_at` and `is_stale`.
+- **ProviderProductHistory** — snapshot of every price/availability change. Stores both old and new values with a `change_type` enum (`INITIAL`, `PRICE_CHANGE`, `AVAILABILITY_CHANGE`, `BOTH`).
+
 ## Design Decisions
 
 - **Zod for env validation**: I prefer Zod over Joi because it gives better TypeScript inference out of the box. The ConfigService is fully typed so you get autocomplete on `config.get('VARIABLE_NAME')`.
 - **Docker Compose**: PostgreSQL runs in a container to keep the local setup simple. The app can run either locally or in a container too.
 - **Bootstrap separation**: The bootstrap logic (Swagger, pipes, etc.) is in a separate file from `main.ts`. This makes it easier to reuse the same setup in e2e tests without duplicating code.
 - **Global ValidationPipe**: Registered as `APP_PIPE` automatically validate and sanitize all incoming requests.
+- **Canonical Product model**: The data model separates `Product` (canonical) from `ProviderProduct` (provider-specific). This way we can aggregate the same product across multiple providers and track each provider's price/availability independently. Each product gets a `canonicalKey` (slugified name) that links the same product across providers. Since we control the simulated providers, we make sure they use consistent product names so the keys match. In production, this would need something more advanced like fuzzy matching or a manual mapping table to handle cases where providers name the same product differently (e.g. "Adobe Photoshop License" vs "Photoshop License").
+- **Staleness via fetchedAt**: Instead of relying on provider timestamps, we track when we last fetched each record (`fetchedAt`). If it's been too long since the last successful fetch, we mark the data as stale. This is more reliable because we control the clock.
