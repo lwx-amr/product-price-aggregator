@@ -1,5 +1,5 @@
-import type { Environment } from '@/config';
-import { swaggerConfig } from '@/config';
+import type { Environment } from '@config';
+import { swaggerConfig } from '@config';
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule } from '@nestjs/swagger';
