@@ -1,4 +1,4 @@
-import { ProviderName } from '../enums';
+import { ProviderName } from '@core/enums';
 
 export interface SeedProduct {
   id: string;

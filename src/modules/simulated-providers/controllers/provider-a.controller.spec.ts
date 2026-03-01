@@ -1,7 +1,7 @@
+import { ProviderName } from '@core/enums';
 import { ServiceUnavailableException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProviderAProductResponseDto } from '../dto';
-import { ProviderName } from '../enums';
 import { SimulatedProviderRegistryService } from '../services/simulated-provider-registry.service';
 import { ProviderAController } from './provider-a.controller';
 

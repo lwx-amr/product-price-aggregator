@@ -1,5 +1,5 @@
+import { ProviderName } from '@core/enums';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProviderName } from '../enums';
 import { SimulatedProviderRegistryService } from './simulated-provider-registry.service';
 
 describe('SimulatedProviderRegistryService', () => {

@@ -15,6 +15,12 @@ const testDefaults: Environment = {
   SIM_MUTATION_INTERVAL_MS: 5000,
   SIM_FAILURE_RATE: 0.1,
   SIM_MAX_DELAY_MS: 0,
+  PROVIDER_A_URL: 'http://localhost:3398/api/v1/sim/providers/a/products',
+  PROVIDER_B_URL: 'http://localhost:3398/api/v1/sim/providers/b/items',
+  PROVIDER_C_URL: 'http://localhost:3398/api/v1/sim/providers/c/catalog',
+  PROVIDER_TIMEOUT_MS: 3000,
+  RETRY_COUNT: 3,
+  RETRY_BACKOFF_MS: 500,
 };
 
 /**
