@@ -1,9 +1,11 @@
+import { SharedModule } from '@modules/shared/shared.module';
 import { Module } from '@nestjs/common';
 import { ProviderAAdapter, ProviderBAdapter, ProviderCAdapter } from './adapters';
 import { PROVIDER_ADAPTERS } from './constants';
 import { ProvidersService } from './providers.service';
 
 @Module({
+  imports: [SharedModule],
   providers: [
     ProvidersService,
     ProviderAAdapter,

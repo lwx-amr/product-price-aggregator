@@ -1,5 +1,6 @@
 import type { Environment } from '@config';
 import { ProviderName } from '@core/enums';
+import { HttpClientFactory, type HttpClient } from '@modules/shared/services';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type {
@@ -12,21 +13,21 @@ import { ProvidersService } from '../providers.service';
 @Injectable()
 export class ProviderCAdapter implements ProviderAdapter {
   readonly providerName = ProviderName.PROVIDER_C;
+  private readonly httpClient: HttpClient;
 
   constructor(
     private readonly configService: ConfigService<Environment, true>,
     private readonly providersService: ProvidersService,
-  ) {}
+    httpClientFactory: HttpClientFactory,
+  ) {
+    this.httpClient = httpClientFactory.create({
+      baseUrl: this.configService.get('PROVIDER_C_URL', { infer: true }),
+      label: this.providerName,
+    });
+  }
 
   async fetchProducts(): Promise<NormalizedProviderProduct[]> {
-    const endpoint = this.configService.get('PROVIDER_C_URL', { infer: true });
-    const response = await fetch(endpoint);
-
-    if (!response.ok) {
-      throw new Error(`Provider C request failed with status ${response.status}`);
-    }
-
-    const products = (await response.json()) as ProviderCProductResponse[];
+    const products = await this.httpClient.request<ProviderCProductResponse[]>();
 
     return products.map((product) => ({
       providerName: this.providerName,
