@@ -30,12 +30,13 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
+    "types": ["node", "jest"],
     "paths": {
       "@/*": ["src/*"],
       "@core/*": ["src/core/*"],
       "@modules/*": ["src/modules/*"],
-      "@config": ["src/config/index.ts"],
-      "@module-options": ["src/module-options/index.ts"]
+      "@config": ["src/config"],
+      "@module-options": ["src/module-options"]
     }
   },
   "watchOptions": {
@@ -43,6 +44,6 @@
     "watchDirectory": "dynamicPriorityPolling",
     "fallbackPolling": "dynamicpriority"
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

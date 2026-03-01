@@ -1,10 +1,9 @@
 import { validate } from '@config';
 import { PrismaModule } from '@modules/database/prisma.module';
+import { SimulatedProvidersModule } from '@modules/simulated-providers/simulated-providers.module';
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -13,10 +12,9 @@ import { AppService } from './app.service';
       validate,
     }),
     PrismaModule,
+    SimulatedProvidersModule,
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
