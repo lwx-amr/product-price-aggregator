@@ -18,6 +18,11 @@ export const envSchema = z
 
     // Swagger
     SWAGGER_PATH: z.string().default('api/docs'),
+
+    // Simulated providers
+    SIM_MUTATION_INTERVAL_MS: z.coerce.number().int().positive().default(5000),
+    SIM_FAILURE_RATE: z.coerce.number().min(0).max(1).default(0.1),
+    SIM_MAX_DELAY_MS: z.coerce.number().int().nonnegative().default(800),
   })
   .transform((env) => ({
     ...env,

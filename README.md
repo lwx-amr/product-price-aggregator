@@ -75,8 +75,6 @@ Check `.env.example` for all available variables with their defaults. The app va
 
 Swagger UI is available at `http://localhost:3398/api/docs` once the app is running. You can explore and test all the endpoints from there.
 
-All API routes are prefixed with `/api/v1/`.
-
 ## Database Schema
 
 ```mermaid
