@@ -1,4 +1,5 @@
 import { ProviderName } from '@core/enums';
+import { HttpClientFactory } from '@modules/shared/services';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProviderAAdapter, ProviderBAdapter, ProviderCAdapter } from './index';
 import { ProvidersService } from '../providers.service';
@@ -15,6 +16,7 @@ describe('Provider adapters', () => {
         ProviderAAdapter,
         ProviderBAdapter,
         ProviderCAdapter,
+        HttpClientFactory,
         ProvidersService,
         mockConfigProvider(),
       ],
@@ -125,14 +127,15 @@ describe('Provider adapters', () => {
     ]);
   });
 
-  it('throws a provider-specific error for non-success upstream responses', async () => {
+  it('throws immediately for non-retryable upstream responses', async () => {
     jest.spyOn(global, 'fetch').mockResolvedValue({
       ok: false,
-      status: 503,
+      status: 400,
     } as Response);
 
     await expect(providerAAdapter.fetchProducts()).rejects.toThrow(
-      'Provider A request failed with status 503',
+      `${ProviderName.PROVIDER_A} request failed with status 400`,
     );
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 });
