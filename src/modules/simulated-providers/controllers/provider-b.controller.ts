@@ -1,3 +1,4 @@
+import { ProviderName } from '@core/enums';
 import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -6,7 +7,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ProviderBProductResponseDto } from '../dto';
-import { ProviderName } from '../enums';
 import { SimulatedProviderRegistryService } from '../services/simulated-provider-registry.service';
 
 @ApiTags('Simulated Providers')

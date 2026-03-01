@@ -1,9 +1,9 @@
 import type { Environment } from '@config';
+import { ProviderName } from '@core/enums';
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { seedProducts } from '../data/seed-products';
-import { ProviderName } from '../enums';
 import type { InternalProduct } from '../interfaces';
 
 @Injectable()

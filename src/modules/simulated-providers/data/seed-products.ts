@@ -1,4 +1,4 @@
-import { ProviderName } from '../enums';
+import { ProviderName } from '@core/enums';
 import { SeedProductRegistry } from '../interfaces';
 
 export const seedProducts: SeedProductRegistry = {

@@ -1,5 +1,6 @@
 import { validate } from '@config';
 import { PrismaModule } from '@modules/database/prisma.module';
+import { ProvidersModule } from '@modules/providers/providers.module';
 import { SimulatedProvidersModule } from '@modules/simulated-providers/simulated-providers.module';
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -12,6 +13,7 @@ import { APP_PIPE } from '@nestjs/core';
       validate,
     }),
     PrismaModule,
+    ProvidersModule,
     SimulatedProvidersModule,
   ],
   providers: [

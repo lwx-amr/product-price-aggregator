@@ -1,28 +1,34 @@
-import { z } from 'zod/v4';
 import { NodeEnvironment } from '@/core/enums';
+import { z } from 'zod/v4';
 
 export const envSchema = z
   .object({
     // Server
-    NODE_ENV: z
-      .enum(Object.values(NodeEnvironment) as [NodeEnvironment, ...NodeEnvironment[]])
-      .default(NodeEnvironment.DEVELOPMENT),
-    PORT: z.coerce.number().default(3398),
+    NODE_ENV: z.enum(Object.values(NodeEnvironment) as [NodeEnvironment, ...NodeEnvironment[]]),
+    PORT: z.coerce.number(),
 
     // Database
-    DB_HOST: z.string().default('localhost'),
-    DB_PORT: z.coerce.number().default(5433),
-    DB_USERNAME: z.string().default('postgres'),
-    DB_PASSWORD: z.string().default('Password123'),
-    DB_NAME: z.string().default('products-service'),
+    DB_HOST: z.string(),
+    DB_PORT: z.coerce.number(),
+    DB_USERNAME: z.string(),
+    DB_PASSWORD: z.string(),
+    DB_NAME: z.string(),
 
     // Swagger
-    SWAGGER_PATH: z.string().default('api/docs'),
+    SWAGGER_PATH: z.string(),
 
     // Simulated providers
-    SIM_MUTATION_INTERVAL_MS: z.coerce.number().int().positive().default(5000),
-    SIM_FAILURE_RATE: z.coerce.number().min(0).max(1).default(0.1),
-    SIM_MAX_DELAY_MS: z.coerce.number().int().nonnegative().default(800),
+    SIM_MUTATION_INTERVAL_MS: z.coerce.number().int().positive(),
+    SIM_FAILURE_RATE: z.coerce.number().min(0).max(1),
+    SIM_MAX_DELAY_MS: z.coerce.number().int().nonnegative(),
+
+    // Provider adapters
+    PROVIDER_A_URL: z.url(),
+    PROVIDER_B_URL: z.url(),
+    PROVIDER_C_URL: z.url(),
+    PROVIDER_TIMEOUT_MS: z.coerce.number().int().positive(),
+    RETRY_COUNT: z.coerce.number().int().nonnegative(),
+    RETRY_BACKOFF_MS: z.coerce.number().int().positive(),
   })
   .transform((env) => ({
     ...env,
