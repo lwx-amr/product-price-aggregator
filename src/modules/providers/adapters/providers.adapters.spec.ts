@@ -54,6 +54,7 @@ describe('Provider adapters', () => {
     await expect(providerAAdapter.fetchProducts()).resolves.toEqual([
       {
         providerName: ProviderName.PROVIDER_A,
+        providerBaseUrl: 'http://localhost:3398/api/v1/sim/providers/a/products',
         externalId: 'prov-a-nestjs-masterclass',
         canonicalKey: 'nestjs-masterclass',
         name: 'NestJS Masterclass',
@@ -84,6 +85,7 @@ describe('Provider adapters', () => {
     await expect(providerBAdapter.fetchProducts()).resolves.toEqual([
       {
         providerName: ProviderName.PROVIDER_B,
+        providerBaseUrl: 'http://localhost:3398/api/v1/sim/providers/b/items',
         externalId: 'prov-b-docker-deep-dive',
         canonicalKey: 'docker-deep-dive',
         name: 'Docker Deep Dive',
@@ -115,6 +117,7 @@ describe('Provider adapters', () => {
     await expect(providerCAdapter.fetchProducts()).resolves.toEqual([
       {
         providerName: ProviderName.PROVIDER_C,
+        providerBaseUrl: 'http://localhost:3398/api/v1/sim/providers/c/catalog',
         externalId: 'prov-c-event-driven-systems',
         canonicalKey: 'event-driven-systems',
         name: 'Event-Driven Systems',

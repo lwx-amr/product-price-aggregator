@@ -1,3 +1,4 @@
+import { AggregationModule } from '@modules/aggregation/aggregation.module';
 import { validate } from '@config';
 import { PrismaModule } from '@modules/database/prisma.module';
 import { ProvidersModule } from '@modules/providers/providers.module';
@@ -5,6 +6,7 @@ import { SimulatedProvidersModule } from '@modules/simulated-providers/simulated
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -12,9 +14,11 @@ import { APP_PIPE } from '@nestjs/core';
       isGlobal: true,
       validate,
     }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     ProvidersModule,
     SimulatedProvidersModule,
+    AggregationModule,
   ],
   providers: [
     {
