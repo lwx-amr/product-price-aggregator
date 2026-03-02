@@ -29,6 +29,8 @@ export const envSchema = z
     PROVIDER_TIMEOUT_MS: z.coerce.number().int().positive(),
     RETRY_COUNT: z.coerce.number().int().nonnegative(),
     RETRY_BACKOFF_MS: z.coerce.number().int().positive(),
+    FETCH_INTERVAL_MS: z.coerce.number().int().positive(),
+    STALE_THRESHOLD_MS: z.coerce.number().int().positive(),
   })
   .transform((env) => ({
     ...env,

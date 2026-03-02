@@ -21,6 +21,8 @@ const testDefaults: Environment = {
   PROVIDER_TIMEOUT_MS: 3000,
   RETRY_COUNT: 3,
   RETRY_BACKOFF_MS: 500,
+  FETCH_INTERVAL_MS: 30000,
+  STALE_THRESHOLD_MS: 90000,
 };
 
 /**

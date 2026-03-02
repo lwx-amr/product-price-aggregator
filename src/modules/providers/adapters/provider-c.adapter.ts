@@ -14,14 +14,16 @@ import { ProvidersService } from '../providers.service';
 export class ProviderCAdapter implements ProviderAdapter {
   readonly providerName = ProviderName.PROVIDER_C;
   private readonly httpClient: HttpClient;
+  private readonly providerBaseUrl: string;
 
   constructor(
     private readonly configService: ConfigService<Environment, true>,
     private readonly providersService: ProvidersService,
     httpClientFactory: HttpClientFactory,
   ) {
+    this.providerBaseUrl = this.configService.get('PROVIDER_C_URL', { infer: true });
     this.httpClient = httpClientFactory.create({
-      baseUrl: this.configService.get('PROVIDER_C_URL', { infer: true }),
+      baseUrl: this.providerBaseUrl,
       label: this.providerName,
     });
   }
@@ -31,6 +33,7 @@ export class ProviderCAdapter implements ProviderAdapter {
 
     return products.map((product) => ({
       providerName: this.providerName,
+      providerBaseUrl: this.providerBaseUrl,
       externalId: product.productId,
       canonicalKey: this.providersService.slugify(product.productName),
       name: product.productName,
