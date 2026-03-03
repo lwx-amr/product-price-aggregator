@@ -2,6 +2,7 @@ import { AggregationModule } from '@modules/aggregation/aggregation.module';
 import { validate } from '@config';
 import { PrismaModule } from '@modules/database/prisma.module';
 import { ProvidersModule } from '@modules/providers/providers.module';
+import { ProductsModule } from '@modules/products/products.module';
 import { SimulatedProvidersModule } from '@modules/simulated-providers/simulated-providers.module';
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -19,6 +20,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ProvidersModule,
     SimulatedProvidersModule,
     AggregationModule,
+    ProductsModule,
   ],
   providers: [
     {
