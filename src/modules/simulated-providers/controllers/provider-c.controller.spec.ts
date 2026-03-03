@@ -1,6 +1,7 @@
 import { ProviderName } from '@core/enums';
 import { ServiceUnavailableException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { getLoggerToken } from 'nestjs-pino';
 import { ProviderCProductResponseDto } from '../dto';
 import { SimulatedProviderRegistryService } from '../services/simulated-provider-registry.service';
 import { ProviderCController } from './provider-c.controller';
@@ -13,7 +14,16 @@ describe('ProviderCController', () => {
   beforeAll(async () => {
     module = await Test.createTestingModule({
       controllers: [ProviderCController],
-      providers: [SimulatedProviderRegistryService, mockConfigProvider()],
+      providers: [
+        SimulatedProviderRegistryService,
+        mockConfigProvider(),
+        {
+          provide: getLoggerToken(SimulatedProviderRegistryService.name),
+          useValue: {
+            info: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<ProviderCController>(ProviderCController);

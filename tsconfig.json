@@ -36,7 +36,8 @@
       "@core/*": ["src/core/*"],
       "@modules/*": ["src/modules/*"],
       "@config": ["src/config"],
-      "@module-options": ["src/module-options"]
+      "@module-options": ["src/module-options"],
+      "@test/*": ["test/*"]
     }
   },
   "watchOptions": {

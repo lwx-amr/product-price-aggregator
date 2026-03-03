@@ -2,20 +2,22 @@ import type { Environment } from '@config';
 import { SettledStatus } from '@core/enums';
 import { PROVIDER_ADAPTERS } from '@modules/providers/constants';
 import type { NormalizedProviderProduct, ProviderAdapter } from '@modules/providers/interfaces';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import type { AggregationProviderResult, AggregationRunSummary } from '../interfaces';
 import { AggregationPersistenceService } from './aggregation-persistence.service';
 
 @Injectable()
 export class AggregationService {
-  private readonly logger = new Logger(AggregationService.name);
   private readonly staleThresholdMs: number;
 
   constructor(
     @Inject(PROVIDER_ADAPTERS) private readonly providerAdapters: ProviderAdapter[],
     private readonly aggregationPersistenceService: AggregationPersistenceService,
     private readonly configService: ConfigService<Environment, true>,
+    @InjectPinoLogger(AggregationService.name)
+    private readonly logger: PinoLogger,
   ) {
     this.staleThresholdMs = this.configService.get('STALE_THRESHOLD_MS', { infer: true });
   }
@@ -51,7 +53,14 @@ export class AggregationService {
         itemCount: 0,
         errorMessage,
       });
-      this.logger.error(`Aggregation failed for ${providerName}: ${errorMessage}`);
+      this.logger.error(
+        {
+          providerName,
+          errorMessage,
+          err: settledResult.reason,
+        },
+        'Provider aggregation failed',
+      );
     }
 
     await this.aggregationPersistenceService.persistBatch(allItems);
@@ -70,9 +79,7 @@ export class AggregationService {
       providers,
     };
 
-    this.logger.log(
-      `Aggregation cycle completed in ${summary.durationMs}ms: ${summary.totalItems} items from ${summary.providersOk} providers.`,
-    );
+    this.logger.info(summary, 'Aggregation cycle completed');
 
     return summary;
   }

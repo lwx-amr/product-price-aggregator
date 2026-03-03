@@ -1,21 +1,25 @@
 import type { Environment } from '@config';
 import { ProviderName } from '@core/enums';
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { seedProducts } from '../data/seed-products';
 import type { InternalProduct } from '../interfaces';
 
 @Injectable()
 export class SimulatedProviderRegistryService implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(SimulatedProviderRegistryService.name);
   private readonly products = new Map<ProviderName, InternalProduct[]>();
   private readonly mutationIntervalMs: number;
   private readonly failureRate: number;
   private readonly maxDelayMs: number;
   private intervalHandle?: NodeJS.Timeout;
 
-  constructor(private readonly configService: ConfigService<Environment, true>) {
+  constructor(
+    private readonly configService: ConfigService<Environment, true>,
+    @InjectPinoLogger(SimulatedProviderRegistryService.name)
+    private readonly logger: PinoLogger,
+  ) {
     this.mutationIntervalMs = this.configService.get('SIM_MUTATION_INTERVAL_MS', {
       infer: true,
     });
@@ -39,8 +43,13 @@ export class SimulatedProviderRegistryService implements OnModuleInit, OnModuleD
     }
 
     this.intervalHandle = setInterval(() => this.mutateAll(), this.mutationIntervalMs);
-    this.logger.log(
-      `Simulated provider registry started with ${this.mutationIntervalMs}ms mutation interval.`,
+    this.logger.info(
+      {
+        mutationIntervalMs: this.mutationIntervalMs,
+        failureRate: this.failureRate,
+        maxDelayMs: this.maxDelayMs,
+      },
+      'Simulated provider registry started',
     );
   }
 

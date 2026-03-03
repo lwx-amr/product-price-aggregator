@@ -1,3 +1,4 @@
+import { Public } from '@core/decorators';
 import { ProviderName } from '@core/enums';
 import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 import {
@@ -6,10 +7,13 @@ import {
   ApiServiceUnavailableResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 import { ProviderAProductResponseDto } from '../dto';
 import { SimulatedProviderRegistryService } from '../services/simulated-provider-registry.service';
 
 @ApiTags('Simulated Providers')
+@Public()
+@SkipThrottle()
 @Controller('sim/providers/a')
 export class ProviderAController {
   constructor(private readonly registryService: SimulatedProviderRegistryService) {}

@@ -1,14 +1,28 @@
 import { ProviderName } from '@core/enums';
 import { Test, TestingModule } from '@nestjs/testing';
+import { getLoggerToken } from 'nestjs-pino';
 import { SimulatedProviderRegistryService } from './simulated-provider-registry.service';
 
 describe('SimulatedProviderRegistryService', () => {
   let service: SimulatedProviderRegistryService;
   let module: TestingModule;
+  let logger: {
+    info: jest.Mock;
+  };
 
   beforeAll(async () => {
+    logger = {
+      info: jest.fn(),
+    };
     module = await Test.createTestingModule({
-      providers: [SimulatedProviderRegistryService, mockConfigProvider()],
+      providers: [
+        SimulatedProviderRegistryService,
+        mockConfigProvider(),
+        {
+          provide: getLoggerToken(SimulatedProviderRegistryService.name),
+          useValue: logger,
+        },
+      ],
     }).compile();
 
     service = module.get(SimulatedProviderRegistryService);
@@ -16,7 +30,7 @@ describe('SimulatedProviderRegistryService', () => {
 
   afterEach(async () => {
     service?.onModuleDestroy();
-    jest.restoreAllMocks();
+    logger.info.mockReset();
   });
 
   afterAll(async () => {

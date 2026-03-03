@@ -75,6 +75,8 @@ Check `.env.example` for all available variables with their defaults. The app va
 
 Swagger UI is available at `http://localhost:3398/api/docs` once the app is running. You can explore and test all the endpoints from there.
 
+The docs page itself loads without authentication, but "Try it out" calls require a valid `x-api-key` header. Click the **Authorize** button in Swagger UI and enter your `API_KEY` value to unlock the protected endpoints.
+
 ## Database Schema
 
 ```mermaid
@@ -140,6 +142,11 @@ erDiagram
 - **Docker Compose**: PostgreSQL runs in a container to keep the local setup simple. The app can run either locally or in a container too.
 - **Bootstrap separation**: The bootstrap logic (Swagger, pipes, etc.) is in a separate file from `main.ts`. This makes it easier to reuse the same setup in e2e tests without duplicating code.
 - **Global ValidationPipe**: Registered as `APP_PIPE` automatically validate and sanitize all incoming requests.
+- **Global exception filter**: All HTTP errors now use one response shape with `statusCode`, `message`, `error`, and `timestamp`. Validation errors keep their message arrays untouched so clients can render them cleanly.
+- **Request logging interceptor**: Every request logs method, path, status, and duration. Failures also log internal error details without leaking stack traces to API responses.
+- **API key guard**: Product endpoints require `x-api-key`, and startup config requires `API_KEY` to be present. Simulated provider endpoints are explicitly public.
+- **Guard ordering**: The API key guard runs before the throttler guard on purpose. Unauthorized requests get rejected immediately without consuming rate-limit budget, so a bad actor spamming invalid keys cannot exhaust the rate limit for legitimate clients.
+- **Rate limiting**: The app applies three in-memory global limits by default: 10 requests per second, 100 requests per minute, and 1000 requests per hour. All values are configurable via environment variables (see `.env.example`). Simulated provider endpoints are excluded so scheduled aggregation calls and manual upstream checks do not get throttled.
 - **Canonical Product model**: The data model separates `Product` (canonical) from `ProviderProduct` (provider-specific). This way we can aggregate the same product across multiple providers and track each provider's price/availability independently. Each product gets a `canonicalKey` (slugified name) that links the same product across providers. Since we control the simulated providers, we make sure they use consistent product names so the keys match. In production, this would need something more advanced like fuzzy matching or a manual mapping table to handle cases where providers name the same product differently (e.g. "Adobe Photoshop License" vs "Photoshop License").
 - **Provider adapter normalization**: Each provider still owns payload mapping into one normalized contract, but the transport logic now lives in a shared resilient HTTP client. Adapters create a provider-specific client from `HttpClientFactory` and only handle normalization. Prices are normalized as fixed 2-decimal strings (not floats) to avoid precision issues when comparing against Prisma's `Decimal(12,2)` and to prevent false-positive change detection in price history. Currency codes are always uppercased to avoid duplicates like `"usd"` vs `"USD"`. Timestamps from providers are parsed safely with a null fallback so a bad timestamp from one provider doesn't crash the entire fetch cycle.
 - **Shared HTTP resilience**: The `SharedModule` (not global — imported explicitly where needed) provides an `HttpClientFactory` that creates configured `HttpClient` instances per provider. Each client wraps `fetch` with timeout via `AbortController`, retries on transient failures (5xx, 429, 408, timeouts, connection errors), and exponential backoff with jitter to prevent thundering herd. Adapters create their client once in the constructor and only handle normalization.

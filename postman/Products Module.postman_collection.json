@@ -7,6 +7,33 @@
     "_exporter_id": "7275071",
     "_collection_link": "https://go.postman.co/collection/7275071-38e5684d-9f26-45a9-934f-b60f20ff9c45?source=collection_link"
   },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "x-api-key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{api_key}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "api_key",
+      "value": "",
+      "type": "string"
+    }
+  ],
   "item": [
     {
       "name": "Get Products",
