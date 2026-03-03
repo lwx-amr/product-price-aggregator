@@ -1,15 +1,19 @@
 import { ChangeType, Currency, type Product, type Provider } from '.prisma/client';
 import { PrismaService } from '@modules/database/prisma.service';
 import type { NormalizedProviderProduct } from '@modules/providers/interfaces';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/client';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class AggregationPersistenceService {
-  private readonly logger = new Logger(AggregationPersistenceService.name);
   private readonly validCurrencies = new Set<Currency>(Object.values(Currency));
 
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    @InjectPinoLogger(AggregationPersistenceService.name)
+    private readonly logger: PinoLogger,
+  ) {}
 
   async persistBatch(items: NormalizedProviderProduct[]): Promise<void> {
     for (const item of items) {
@@ -17,8 +21,13 @@ export class AggregationPersistenceService {
         await this.persistItem(item);
       } catch (error) {
         this.logger.error(
-          `Failed to persist ${item.providerName}:${item.externalId}`,
-          error instanceof Error ? error.stack : undefined,
+          {
+            providerName: item.providerName,
+            externalId: item.externalId,
+            canonicalKey: item.canonicalKey,
+            err: error,
+          },
+          'Failed to persist normalized provider product',
         );
       }
     }
@@ -121,7 +130,10 @@ export class AggregationPersistenceService {
     });
 
     if (result.count > 0) {
-      this.logger.warn(`Marked ${result.count} provider products as stale.`);
+      this.logger.warn(
+        { count: result.count, staleThresholdMs },
+        'Marked provider products as stale',
+      );
     }
 
     return result.count;

@@ -2,8 +2,8 @@ import { ChangeType, Currency, Prisma } from '.prisma/client';
 import { ProviderName } from '@core/enums';
 import { PrismaService } from '@modules/database/prisma.service';
 import type { NormalizedProviderProduct } from '@modules/providers/interfaces';
-import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { getLoggerToken } from 'nestjs-pino';
 import {
   createMockProductsPrismaService,
   createMockProductsPrismaTransactionClient,
@@ -17,6 +17,10 @@ describe('AggregationPersistenceService', () => {
   let service: AggregationPersistenceService;
   let prismaService: MockProductsPrismaService;
   let tx: MockProductsPrismaTransactionClient;
+  let logger: {
+    error: jest.Mock;
+    warn: jest.Mock;
+  };
 
   const normalizedItem: NormalizedProviderProduct = {
     providerName: ProviderName.PROVIDER_A,
@@ -34,6 +38,10 @@ describe('AggregationPersistenceService', () => {
   beforeAll(async () => {
     tx = createMockProductsPrismaTransactionClient();
     prismaService = createMockProductsPrismaService();
+    logger = {
+      error: jest.fn(),
+      warn: jest.fn(),
+    };
 
     prismaService.$transaction.mockImplementation(
       async (callback: (client: typeof tx) => unknown) => callback(tx),
@@ -45,6 +53,10 @@ describe('AggregationPersistenceService', () => {
         {
           provide: PrismaService,
           useValue: prismaService,
+        },
+        {
+          provide: getLoggerToken(AggregationPersistenceService.name),
+          useValue: logger,
         },
       ],
     })
@@ -81,7 +93,8 @@ describe('AggregationPersistenceService', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    logger.error.mockReset();
+    logger.warn.mockReset();
   });
 
   afterAll(async () => {
@@ -147,6 +160,47 @@ describe('AggregationPersistenceService', () => {
     );
   });
 
+  it('stores a PRICE_CHANGE history entry when only the price changes', async () => {
+    tx.providerProduct.findUnique.mockResolvedValue({
+      id: 100,
+      price: new Prisma.Decimal('59.99'),
+      availability: true,
+    });
+
+    await service.persistItem(normalizedItem);
+
+    expect(tx.providerProductHistory.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          providerProductId: 100,
+          changeType: ChangeType.PRICE_CHANGE,
+          oldAvailability: true,
+        }),
+      }),
+    );
+  });
+
+  it('stores an AVAILABILITY_CHANGE history entry when only availability changes', async () => {
+    tx.providerProduct.findUnique.mockResolvedValue({
+      id: 100,
+      price: new Prisma.Decimal('79.99'),
+      availability: false,
+    });
+
+    await service.persistItem(normalizedItem);
+
+    expect(tx.providerProductHistory.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          providerProductId: 100,
+          changeType: ChangeType.AVAILABILITY_CHANGE,
+          oldPrice: new Prisma.Decimal('79.99'),
+          oldAvailability: false,
+        }),
+      }),
+    );
+  });
+
   it('marks stale provider products using fetchedAt', async () => {
     prismaService.providerProduct.updateMany.mockResolvedValue({ count: 3 });
 
@@ -164,7 +218,6 @@ describe('AggregationPersistenceService', () => {
   });
 
   it('logs and skips invalid items without stopping the batch', async () => {
-    const loggerErrorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
     const invalidItem: NormalizedProviderProduct = {
       ...normalizedItem,
       currency: 'SAR',
@@ -175,7 +228,20 @@ describe('AggregationPersistenceService', () => {
 
     await service.persistBatch([invalidItem, normalizedItem]);
 
-    expect(loggerErrorSpy).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledTimes(1);
     expect(tx.providerProduct.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('throws for invalid prices before starting persistence', async () => {
+    const invalidPriceItem: NormalizedProviderProduct = {
+      ...normalizedItem,
+      price: '0',
+    };
+
+    await expect(service.persistItem(invalidPriceItem)).rejects.toThrow(
+      `Invalid price "0" for ${normalizedItem.providerName}:${normalizedItem.externalId}`,
+    );
+    expect(prismaService.provider.upsert).not.toHaveBeenCalled();
+    expect(prismaService.product.upsert).not.toHaveBeenCalled();
   });
 });

@@ -1,13 +1,21 @@
-import { AggregationModule } from '@modules/aggregation/aggregation.module';
+import type { Environment } from '@config';
 import { validate } from '@config';
+import { HttpExceptionFilter } from '@core/filters';
+import { ApiKeyGuard } from '@core/guards';
+import { LoggingInterceptor } from '@core/interceptors';
+import { buildPinoOptions, buildThrottlerOptions } from '@module-options';
+import { AggregationModule } from '@modules/aggregation/aggregation.module';
 import { PrismaModule } from '@modules/database/prisma.module';
-import { ProvidersModule } from '@modules/providers/providers.module';
+import { HealthModule } from '@modules/health/health.module';
 import { ProductsModule } from '@modules/products/products.module';
+import { ProvidersModule } from '@modules/providers/providers.module';
 import { SimulatedProvidersModule } from '@modules/simulated-providers/simulated-providers.module';
 import { Module, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { APP_PIPE } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { LoggerModule } from 'nestjs-pino';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -15,9 +23,20 @@ import { ScheduleModule } from '@nestjs/schedule';
       isGlobal: true,
       validate,
     }),
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService<Environment, true>) => buildPinoOptions(config),
+    }),
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService<Environment, true>) => buildThrottlerOptions(config),
+    }),
     PrismaModule,
     ProvidersModule,
+    HealthModule,
     SimulatedProvidersModule,
     AggregationModule,
     ProductsModule,
@@ -32,6 +51,22 @@ import { ScheduleModule } from '@nestjs/schedule';
         stopAtFirstError: true,
         transformOptions: { enableImplicitConversion: true },
       }),
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ApiKeyGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

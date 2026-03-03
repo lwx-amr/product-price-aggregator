@@ -2,6 +2,7 @@ import { ProviderName, SettledStatus } from '@core/enums';
 import { PROVIDER_ADAPTERS } from '@modules/providers/constants';
 import type { NormalizedProviderProduct, ProviderAdapter } from '@modules/providers/interfaces';
 import { Test, TestingModule } from '@nestjs/testing';
+import { getLoggerToken } from 'nestjs-pino';
 import { AggregationService } from './aggregation.service';
 import { AggregationPersistenceService } from './aggregation-persistence.service';
 
@@ -32,6 +33,13 @@ describe('AggregationService', () => {
         {
           provide: PROVIDER_ADAPTERS,
           useValue: providerAdapters,
+        },
+        {
+          provide: getLoggerToken(AggregationService.name),
+          useValue: {
+            info: jest.fn(),
+            error: jest.fn(),
+          },
         },
       ],
     }).overrideProvider(AggregationPersistenceService).useValue({

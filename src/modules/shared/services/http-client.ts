@@ -1,9 +1,9 @@
-import { Logger } from '@nestjs/common';
+import pino from 'pino';
 import { RETRYABLE_STATUSES, TRANSIENT_ERROR_CODES } from '../constants';
 import { HttpClientOptions } from '../interfaces';
 
 export class HttpClient {
-  private readonly logger = new Logger(HttpClient.name);
+  private readonly logger = pino({ name: HttpClient.name });
 
   constructor(private readonly options: HttpClientOptions) {}
 
@@ -37,14 +37,26 @@ export class HttpClient {
       if (attempt <= this.options.retries) {
         const delay = this.getBackoffDelay(attempt);
         this.logger.warn(
-          `${this.options.label}: attempt ${attempt} failed (${lastError.message}). Retrying in ${delay}ms`,
+          {
+            label: this.options.label,
+            attempt,
+            retries: this.options.retries,
+            delayMs: delay,
+            errorMessage: lastError.message,
+          },
+          'HTTP client request failed, retrying',
         );
         await this.sleep(delay);
       }
     }
 
     this.logger.error(
-      `${this.options.label}: all ${this.options.retries + 1} attempts failed (${lastError!.message})`,
+      {
+        label: this.options.label,
+        attempts: this.options.retries + 1,
+        errorMessage: lastError!.message,
+      },
+      'HTTP client request failed after all retries',
     );
     throw lastError!;
   }

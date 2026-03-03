@@ -1,4 +1,5 @@
 import { ChangeType, Currency, Prisma } from '.prisma/client';
+import { ProviderName } from '@/core/enums';
 import { PrismaService } from '@modules/database/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -126,6 +127,22 @@ describe('ProductsService', () => {
     await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
   });
 
+  it('returns a product detail when the product exists', async () => {
+    const product = {
+      id: 1,
+      canonicalKey: 'nestjs-masterclass',
+      name: 'NestJS Masterclass',
+      description: 'Advanced NestJS course.',
+      createdAt: new Date('2026-03-02T09:00:00.000Z'),
+      updatedAt: new Date('2026-03-02T10:00:00.000Z'),
+      providerProducts: [],
+    };
+
+    prismaService.product.findUnique.mockResolvedValue(product);
+
+    await expect(service.findOne(1)).resolves.toEqual(product);
+  });
+
   it('returns recent non-initial changes with pagination metadata', async () => {
     const query = new GetChangesQueryDto();
     query.minutes = 30;
@@ -177,6 +194,71 @@ describe('ProductsService', () => {
           }),
         }),
         oldAvailability: false,
+      }),
+    );
+  });
+
+  it('uses an explicit since date when provided for changes', async () => {
+    const query = new GetChangesQueryDto();
+    query.since = '2026-03-02T09:30:00.000Z';
+
+    prismaService.providerProductHistory.count.mockResolvedValue(0);
+    prismaService.providerProductHistory.findMany.mockResolvedValue([]);
+
+    await service.findChanges(query);
+
+    expect(prismaService.providerProductHistory.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          changedAt: {
+            gte: new Date('2026-03-02T09:30:00.000Z'),
+          },
+        }),
+      }),
+    );
+  });
+
+  it('filters products by name, stale flag, and provider name', async () => {
+    const query = new GetProductsQueryDto();
+    query.name = ' NestJS ';
+    query.stale = false;
+    query.provider = ProviderName.PROVIDER_A;
+
+    prismaService.product.count.mockResolvedValue(0);
+    prismaService.product.findMany.mockResolvedValue([]);
+
+    await service.findAll(query);
+
+    expect(prismaService.product.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          name: {
+            contains: 'NestJS',
+            mode: 'insensitive',
+          },
+          providerProducts: {
+            some: {
+              isStale: false,
+              provider: {
+                is: {
+                  name: 'provider-a',
+                },
+              },
+            },
+          },
+        },
+        select: expect.objectContaining({
+          providerProducts: expect.objectContaining({
+            where: {
+              isStale: false,
+              provider: {
+                is: {
+                  name: 'provider-a',
+                },
+              },
+            },
+          }),
+        }),
       }),
     );
   });

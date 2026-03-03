@@ -1,7 +1,13 @@
 import { ResponseFactory } from '@core/factories';
 import type { DataPageResponse, DataResponse } from '@core/interfaces';
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   ChangeResponseDto,
   GetChangesQueryDto,
@@ -12,6 +18,7 @@ import {
 import { ProductsService } from './products.service';
 
 @ApiTags('Products')
+@ApiSecurity('api-key')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
