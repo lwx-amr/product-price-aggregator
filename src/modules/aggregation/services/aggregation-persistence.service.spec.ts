@@ -4,27 +4,19 @@ import { PrismaService } from '@modules/database/prisma.service';
 import type { NormalizedProviderProduct } from '@modules/providers/interfaces';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import {
+  createMockProductsPrismaService,
+  createMockProductsPrismaTransactionClient,
+  type MockProductsPrismaService,
+  type MockProductsPrismaTransactionClient,
+} from '../../../../test/helpers/products-prisma.helper';
 import { AggregationPersistenceService } from './aggregation-persistence.service';
 
 describe('AggregationPersistenceService', () => {
   let module: TestingModule;
   let service: AggregationPersistenceService;
-  let prismaService: {
-    provider: { upsert: jest.Mock };
-    product: { upsert: jest.Mock };
-    providerProduct: { updateMany: jest.Mock };
-    $transaction: jest.Mock;
-  };
-  let tx: {
-    providerProduct: {
-      findUnique: jest.Mock;
-      create: jest.Mock;
-      update: jest.Mock;
-    };
-    providerProductHistory: {
-      create: jest.Mock;
-    };
-  };
+  let prismaService: MockProductsPrismaService;
+  let tx: MockProductsPrismaTransactionClient;
 
   const normalizedItem: NormalizedProviderProduct = {
     providerName: ProviderName.PROVIDER_A,
@@ -40,23 +32,8 @@ describe('AggregationPersistenceService', () => {
   };
 
   beforeAll(async () => {
-    tx = {
-      providerProduct: {
-        findUnique: jest.fn(),
-        create: jest.fn(),
-        update: jest.fn(),
-      },
-      providerProductHistory: {
-        create: jest.fn(),
-      },
-    };
-
-    prismaService = {
-      provider: { upsert: jest.fn() },
-      product: { upsert: jest.fn() },
-      providerProduct: { updateMany: jest.fn() },
-      $transaction: jest.fn(),
-    };
+    tx = createMockProductsPrismaTransactionClient();
+    prismaService = createMockProductsPrismaService();
 
     prismaService.$transaction.mockImplementation(
       async (callback: (client: typeof tx) => unknown) => callback(tx),

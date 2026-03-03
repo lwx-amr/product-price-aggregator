@@ -1,0 +1,346 @@
+{
+  "info": {
+    "_postman_id": "38e5684d-9f26-45a9-934f-b60f20ff9c45",
+    "name": "Product Price Aggregator - Products Module",
+    "description": "Postman collection for products module endpoints only.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "7275071",
+    "_collection_link": "https://go.postman.co/collection/7275071-38e5684d-9f26-45a9-934f-b60f20ff9c45?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get Products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "{{product_name}}",
+              "disabled": true
+            },
+            {
+              "key": "minPrice",
+              "value": "{{min_price}}",
+              "disabled": true
+            },
+            {
+              "key": "maxPrice",
+              "value": "{{max_price}}",
+              "disabled": true
+            },
+            {
+              "key": "availability",
+              "value": "{{availability}}",
+              "disabled": true
+            },
+            {
+              "key": "provider",
+              "value": "{{provider}}",
+              "disabled": true
+            },
+            {
+              "key": "stale",
+              "value": "{{stale}}",
+              "disabled": true
+            },
+            {
+              "key": "page",
+              "value": "{{page}}",
+              "disabled": true
+            },
+            {
+              "key": "limit",
+              "value": "{{limit}}",
+              "disabled": true
+            }
+          ]
+        },
+        "description": "Returns paginated canonical products with matching provider offers."
+      },
+      "response": [
+        {
+          "name": "Get Products",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products?name={{product_name}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "{{product_name}}"
+                },
+                {
+                  "key": "minPrice",
+                  "value": "{{min_price}}",
+                  "disabled": true
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "{{max_price}}",
+                  "disabled": true
+                },
+                {
+                  "key": "availability",
+                  "value": "{{availability}}",
+                  "disabled": true
+                },
+                {
+                  "key": "provider",
+                  "value": "{{provider}}",
+                  "disabled": true
+                },
+                {
+                  "key": "stale",
+                  "value": "{{stale}}",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "{{page}}",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "{{limit}}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "5903"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"170f-2ShSRqbnIuPmxvCwq0APGkrJjPM\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 22:23:19 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"data\": [\n        {\n            \"id\": 4,\n            \"canonicalKey\": \"aws-cloud-handbook\",\n            \"name\": \"AWS Cloud Handbook\",\n            \"description\": \"Practical guide to deploying and scaling workloads on AWS.\",\n            \"offers\": [\n                {\n                    \"id\": 4,\n                    \"externalId\": \"prov-a-aws-cloud-handbook\",\n                    \"providerName\": \"provider-a\",\n                    \"price\": 29.36,\n                    \"currency\": \"USD\",\n                    \"availability\": true,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.447Z\",\n                    \"isStale\": false\n                },\n                {\n                    \"id\": 16,\n                    \"externalId\": \"prov-c-aws-cloud-handbook\",\n                    \"providerName\": \"provider-c\",\n                    \"price\": 34.78,\n                    \"currency\": \"USD\",\n                    \"availability\": true,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.577Z\",\n                    \"isStale\": false\n                },\n                {\n                    \"id\": 10,\n                    \"externalId\": \"prov-b-aws-cloud-handbook\",\n                    \"providerName\": \"provider-b\",\n                    \"price\": 39.11,\n                    \"currency\": \"USD\",\n                    \"availability\": true,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.000Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.514Z\",\n                    \"isStale\": false\n                }\n            ]\n        },\n        {\n            \"id\": 3,\n            \"canonicalKey\": \"docker-deep-dive\",\n            \"name\": \"Docker Deep Dive\",\n            \"description\": \"E-book covering production Docker patterns and debugging.\",\n            \"offers\": [\n                {\n                    \"id\": 9,\n                    \"externalId\": \"prov-b-docker-deep-dive\",\n                    \"providerName\": \"provider-b\",\n                    \"price\": 20.07,\n                    \"currency\": \"USD\",\n                    \"availability\": false,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.000Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.503Z\",\n                    \"isStale\": false\n                },\n                {\n                    \"id\": 15,\n                    \"externalId\": \"prov-c-docker-deep-dive\",\n                    \"providerName\": \"provider-c\",\n                    \"price\": 22.48,\n                    \"currency\": \"USD\",\n                    \"availability\": true,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.567Z\",\n                    \"isStale\": false\n                },\n                {\n                    \"id\": 3,\n                    \"externalId\": \"prov-a-docker-deep-dive\",\n                    \"providerName\": \"provider-a\",\n                    \"price\": 24.3,\n                    \"currency\": \"USD\",\n                    \"availability\": true,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.436Z\",\n                    \"isStale\": false\n                }\n            ]\n        },\n        {\n            \"id\": 9,\n            \"canonicalKey\": \"event-driven-systems\",\n            \"name\": \"Event-Driven Systems\",\n            \"description\": \"Digital course on event sourcing and asynchronous workflows.\",\n            \"offers\": [\n                {\n                    \"id\": 17,\n                    \"externalId\": \"prov-c-event-driven-systems\",\n                    \"providerName\": \"provider-c\",\n                    \"price\": 78.19,\n                    \"currency\": \"USD\",\n                    \"availability\": false,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.588Z\",\n                    \"isStale\": false\n                }\n            ]\n        },\n        {\n            \"id\": 5,\n            \"canonicalKey\": \"kubernetes-for-apis\",\n            \"name\": \"Kubernetes for APIs\",\n            \"description\": \"Video course focused on operating containerized API platforms.\",\n            \"offers\": [\n                {\n                    \"id\": 5,\n                    \"externalId\": \"prov-a-kubernetes-for-apis\",\n                    \"providerName\": \"provider-a\",\n                    \"price\": 98.86,\n                    \"currency\": \"USD\",\n                    \"availability\": true,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.458Z\",\n                    \"isStale\": false\n                }\n            ]\n        },\n        {\n            \"id\": 1,\n            \"canonicalKey\": \"nestjs-masterclass\",\n            \"name\": \"NestJS Masterclass\",\n            \"description\": \"Advanced NestJS course for backend engineers.\",\n            \"offers\": [\n                {\n                    \"id\": 13,\n                    \"externalId\": \"prov-c-nestjs-masterclass\",\n                    \"providerName\": \"provider-c\",\n                    \"price\": 70,\n                    \"currency\": \"USD\",\n                    \"availability\": true,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.544Z\",\n                    \"isStale\": false\n                },\n                {\n                    \"id\": 1,\n                    \"externalId\": \"prov-a-nestjs-masterclass\",\n                    \"providerName\": \"provider-a\",\n                    \"price\": 84.27,\n                    \"currency\": \"USD\",\n                    \"availability\": false,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.401Z\",\n                    \"isStale\": false\n                },\n                {\n                    \"id\": 7,\n                    \"externalId\": \"prov-b-nestjs-masterclass\",\n                    \"providerName\": \"provider-b\",\n                    \"price\": 98.19,\n                    \"currency\": \"USD\",\n                    \"availability\": false,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.000Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.479Z\",\n                    \"isStale\": false\n                }\n            ]\n        },\n        {\n            \"id\": 7,\n            \"canonicalKey\": \"observability-playbook\",\n            \"name\": \"Observability Playbook\",\n            \"description\": \"Hands-on guide for logs, metrics, and tracing in backend systems.\",\n            \"offers\": [\n                {\n                    \"id\": 11,\n                    \"externalId\": \"prov-b-observability-playbook\",\n                    \"providerName\": \"provider-b\",\n                    \"price\": 30.55,\n                    \"currency\": \"USD\",\n                    \"availability\": true,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.000Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.524Z\",\n                    \"isStale\": false\n                }\n            ]\n        },\n        {\n            \"id\": 10,\n            \"canonicalKey\": \"postgres-performance-lab\",\n            \"name\": \"Postgres Performance Lab\",\n            \"description\": \"Practical lab for query tuning and index design in PostgreSQL.\",\n            \"offers\": [\n                {\n                    \"id\": 18,\n                    \"externalId\": \"prov-c-postgres-performance-lab\",\n                    \"providerName\": \"provider-c\",\n                    \"price\": 39.3,\n                    \"currency\": \"USD\",\n                    \"availability\": false,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.600Z\",\n                    \"isStale\": false\n                }\n            ]\n        },\n        {\n            \"id\": 6,\n            \"canonicalKey\": \"prisma-query-kit\",\n            \"name\": \"Prisma Query Kit\",\n            \"description\": \"Template pack with reusable Prisma query patterns.\",\n            \"offers\": [\n                {\n                    \"id\": 6,\n                    \"externalId\": \"prov-a-prisma-query-kit\",\n                    \"providerName\": \"provider-a\",\n                    \"price\": 20.8,\n                    \"currency\": \"USD\",\n                    \"availability\": false,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.470Z\",\n                    \"isStale\": false\n                }\n            ]\n        },\n        {\n            \"id\": 8,\n            \"canonicalKey\": \"secure-node-js-workshop\",\n            \"name\": \"Secure Node.js Workshop\",\n            \"description\": \"Workshop materials for securing Node.js services in production.\",\n            \"offers\": [\n                {\n                    \"id\": 12,\n                    \"externalId\": \"prov-b-secure-nodejs-workshop\",\n                    \"providerName\": \"provider-b\",\n                    \"price\": 56.53,\n                    \"currency\": \"USD\",\n                    \"availability\": true,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.000Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.533Z\",\n                    \"isStale\": false\n                }\n            ]\n        },\n        {\n            \"id\": 2,\n            \"canonicalKey\": \"typescript-pro-license\",\n            \"name\": \"TypeScript Pro License\",\n            \"description\": \"Developer tooling license for advanced TypeScript workflows.\",\n            \"offers\": [\n                {\n                    \"id\": 2,\n                    \"externalId\": \"prov-a-typescript-pro-license\",\n                    \"providerName\": \"provider-a\",\n                    \"price\": 120.53,\n                    \"currency\": \"USD\",\n                    \"availability\": true,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.425Z\",\n                    \"isStale\": false\n                },\n                {\n                    \"id\": 14,\n                    \"externalId\": \"prov-c-typescript-pro-license\",\n                    \"providerName\": \"provider-c\",\n                    \"price\": 125.84,\n                    \"currency\": \"USD\",\n                    \"availability\": false,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.758Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.556Z\",\n                    \"isStale\": false\n                },\n                {\n                    \"id\": 8,\n                    \"externalId\": \"prov-b-typescript-pro-license\",\n                    \"providerName\": \"provider-b\",\n                    \"price\": 126.19,\n                    \"currency\": \"USD\",\n                    \"availability\": false,\n                    \"sourceLastUpdated\": \"2026-03-02T22:23:17.000Z\",\n                    \"fetchedAt\": \"2026-03-02T22:23:18.488Z\",\n                    \"isStale\": false\n                }\n            ]\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"total\": 10,\n        \"totalPages\": 1,\n        \"hasNext\": false\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Product By Id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products/{{product_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products",
+            "{{product_id}}"
+          ]
+        },
+        "description": "Returns one canonical product with all provider offers and recent history."
+      },
+      "response": [
+        {
+          "name": "Get Product By Id",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "11207"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2bc7-HR7hFLkvH3XAs7ERhhF06FZxbYE\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 23:47:49 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"data\": {\n        \"id\": 1,\n        \"canonicalKey\": \"nestjs-masterclass\",\n        \"name\": \"NestJS Masterclass\",\n        \"description\": \"Advanced NestJS course for backend engineers.\",\n        \"createdAt\": \"2026-03-02T19:50:21.494Z\",\n        \"updatedAt\": \"2026-03-02T19:50:21.494Z\",\n        \"offers\": [\n            {\n                \"id\": 1,\n                \"externalId\": \"prov-a-nestjs-masterclass\",\n                \"providerName\": \"provider-a\",\n                \"price\": 149.95,\n                \"currency\": \"USD\",\n                \"availability\": true,\n                \"sourceLastUpdated\": \"2026-03-02T23:47:41.928Z\",\n                \"fetchedAt\": \"2026-03-02T23:47:42.325Z\",\n                \"isStale\": false,\n                \"history\": [\n                    {\n                        \"id\": 5038,\n                        \"price\": 149.95,\n                        \"oldPrice\": 144.29,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:47:42.325Z\"\n                    },\n                    {\n                        \"id\": 5020,\n                        \"price\": 144.29,\n                        \"oldPrice\": 140.96,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"BOTH\",\n                        \"changedAt\": \"2026-03-02T23:47:13.821Z\"\n                    },\n                    {\n                        \"id\": 5002,\n                        \"price\": 140.96,\n                        \"oldPrice\": 139.18,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"BOTH\",\n                        \"changedAt\": \"2026-03-02T23:46:45.192Z\"\n                    },\n                    {\n                        \"id\": 4984,\n                        \"price\": 139.18,\n                        \"oldPrice\": 135.73,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:46:16.594Z\"\n                    },\n                    {\n                        \"id\": 4966,\n                        \"price\": 135.73,\n                        \"oldPrice\": 140.47,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:45:47.470Z\"\n                    },\n                    {\n                        \"id\": 4948,\n                        \"price\": 140.47,\n                        \"oldPrice\": 123.21,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:45:19.229Z\"\n                    },\n                    {\n                        \"id\": 4930,\n                        \"price\": 123.21,\n                        \"oldPrice\": 112.63,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:44:50.665Z\"\n                    },\n                    {\n                        \"id\": 4912,\n                        \"price\": 112.63,\n                        \"oldPrice\": 111.89,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"BOTH\",\n                        \"changedAt\": \"2026-03-02T23:44:21.686Z\"\n                    },\n                    {\n                        \"id\": 4894,\n                        \"price\": 111.89,\n                        \"oldPrice\": 117.72,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:43:53.492Z\"\n                    },\n                    {\n                        \"id\": 4876,\n                        \"price\": 117.72,\n                        \"oldPrice\": 126.12,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:43:24.769Z\"\n                    },\n                    {\n                        \"id\": 4858,\n                        \"price\": 126.12,\n                        \"oldPrice\": 129.42,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:42:56.161Z\"\n                    },\n                    {\n                        \"id\": 4840,\n                        \"price\": 129.42,\n                        \"oldPrice\": 120.39,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"BOTH\",\n                        \"changedAt\": \"2026-03-02T23:42:27.413Z\"\n                    },\n                    {\n                        \"id\": 4822,\n                        \"price\": 120.39,\n                        \"oldPrice\": 107.51,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:41:59.577Z\"\n                    },\n                    {\n                        \"id\": 4804,\n                        \"price\": 107.51,\n                        \"oldPrice\": 113.11,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:41:29.989Z\"\n                    },\n                    {\n                        \"id\": 4786,\n                        \"price\": 113.11,\n                        \"oldPrice\": 118.32,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:41:01.838Z\"\n                    },\n                    {\n                        \"id\": 4768,\n                        \"price\": 118.32,\n                        \"oldPrice\": 111.88,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:40:33.562Z\"\n                    },\n                    {\n                        \"id\": 4750,\n                        \"price\": 111.88,\n                        \"oldPrice\": 120.57,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:40:04.944Z\"\n                    },\n                    {\n                        \"id\": 4732,\n                        \"price\": 120.57,\n                        \"oldPrice\": 130.36,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"BOTH\",\n                        \"changedAt\": \"2026-03-02T23:39:36.308Z\"\n                    },\n                    {\n                        \"id\": 4714,\n                        \"price\": 130.36,\n                        \"oldPrice\": 127.71,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:39:08.030Z\"\n                    },\n                    {\n                        \"id\": 4696,\n                        \"price\": 127.71,\n                        \"oldPrice\": 118.24,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:38:39.296Z\"\n                    }\n                ]\n            },\n            {\n                \"id\": 7,\n                \"externalId\": \"prov-b-nestjs-masterclass\",\n                \"providerName\": \"provider-b\",\n                \"price\": 73.95,\n                \"currency\": \"USD\",\n                \"availability\": true,\n                \"sourceLastUpdated\": \"2026-03-02T23:47:41.000Z\",\n                \"fetchedAt\": \"2026-03-02T23:47:42.526Z\",\n                \"isStale\": false,\n                \"history\": [\n                    {\n                        \"id\": 5044,\n                        \"price\": 73.95,\n                        \"oldPrice\": 71.9,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:47:42.526Z\"\n                    },\n                    {\n                        \"id\": 5026,\n                        \"price\": 71.9,\n                        \"oldPrice\": 73.59,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:47:13.942Z\"\n                    },\n                    {\n                        \"id\": 5008,\n                        \"price\": 73.59,\n                        \"oldPrice\": 76.9,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:46:45.258Z\"\n                    },\n                    {\n                        \"id\": 4990,\n                        \"price\": 76.9,\n                        \"oldPrice\": 81.47,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"BOTH\",\n                        \"changedAt\": \"2026-03-02T23:46:16.662Z\"\n                    },\n                    {\n                        \"id\": 4972,\n                        \"price\": 81.47,\n                        \"oldPrice\": 87.47,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:45:47.547Z\"\n                    },\n                    {\n                        \"id\": 4954,\n                        \"price\": 87.47,\n                        \"oldPrice\": 95.92,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:45:19.297Z\"\n                    },\n                    {\n                        \"id\": 4936,\n                        \"price\": 95.92,\n                        \"oldPrice\": 83.23,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:44:50.730Z\"\n                    },\n                    {\n                        \"id\": 4918,\n                        \"price\": 83.23,\n                        \"oldPrice\": 76.31,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:44:21.753Z\"\n                    },\n                    {\n                        \"id\": 4900,\n                        \"price\": 76.31,\n                        \"oldPrice\": 65.33,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:43:53.565Z\"\n                    },\n                    {\n                        \"id\": 4882,\n                        \"price\": 65.33,\n                        \"oldPrice\": 66.04,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:43:24.834Z\"\n                    },\n                    {\n                        \"id\": 4864,\n                        \"price\": 66.04,\n                        \"oldPrice\": 70.32,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:42:56.229Z\"\n                    },\n                    {\n                        \"id\": 4846,\n                        \"price\": 70.32,\n                        \"oldPrice\": 69.43,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"BOTH\",\n                        \"changedAt\": \"2026-03-02T23:42:27.483Z\"\n                    },\n                    {\n                        \"id\": 4828,\n                        \"price\": 69.43,\n                        \"oldPrice\": 63.97,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:41:59.647Z\"\n                    },\n                    {\n                        \"id\": 4810,\n                        \"price\": 63.97,\n                        \"oldPrice\": 63.27,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:41:30.169Z\"\n                    },\n                    {\n                        \"id\": 4792,\n                        \"price\": 63.27,\n                        \"oldPrice\": 61.12,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:41:01.921Z\"\n                    },\n                    {\n                        \"id\": 4774,\n                        \"price\": 61.12,\n                        \"oldPrice\": 60.16,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"BOTH\",\n                        \"changedAt\": \"2026-03-02T23:40:33.687Z\"\n                    },\n                    {\n                        \"id\": 4756,\n                        \"price\": 60.16,\n                        \"oldPrice\": 60.96,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:40:05.023Z\"\n                    },\n                    {\n                        \"id\": 4738,\n                        \"price\": 60.96,\n                        \"oldPrice\": 61,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:39:36.385Z\"\n                    },\n                    {\n                        \"id\": 4720,\n                        \"price\": 61,\n                        \"oldPrice\": 57.75,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:39:08.101Z\"\n                    },\n                    {\n                        \"id\": 4702,\n                        \"price\": 57.75,\n                        \"oldPrice\": 61.1,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:38:39.364Z\"\n                    }\n                ]\n            },\n            {\n                \"id\": 13,\n                \"externalId\": \"prov-c-nestjs-masterclass\",\n                \"providerName\": \"provider-c\",\n                \"price\": 97.01,\n                \"currency\": \"USD\",\n                \"availability\": true,\n                \"sourceLastUpdated\": \"2026-03-02T23:47:41.928Z\",\n                \"fetchedAt\": \"2026-03-02T23:47:42.695Z\",\n                \"isStale\": false,\n                \"history\": [\n                    {\n                        \"id\": 5050,\n                        \"price\": 97.01,\n                        \"oldPrice\": 95.47,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:47:42.695Z\"\n                    },\n                    {\n                        \"id\": 5032,\n                        \"price\": 95.47,\n                        \"oldPrice\": 102.25,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:47:14.077Z\"\n                    },\n                    {\n                        \"id\": 5014,\n                        \"price\": 102.25,\n                        \"oldPrice\": 121.08,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:46:45.319Z\"\n                    },\n                    {\n                        \"id\": 4996,\n                        \"price\": 121.08,\n                        \"oldPrice\": 128.53,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:46:16.716Z\"\n                    },\n                    {\n                        \"id\": 4978,\n                        \"price\": 128.53,\n                        \"oldPrice\": 129.45,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:45:47.603Z\"\n                    },\n                    {\n                        \"id\": 4960,\n                        \"price\": 129.45,\n                        \"oldPrice\": 119.99,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:45:19.354Z\"\n                    },\n                    {\n                        \"id\": 4942,\n                        \"price\": 119.99,\n                        \"oldPrice\": 117.56,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:44:50.785Z\"\n                    },\n                    {\n                        \"id\": 4924,\n                        \"price\": 117.56,\n                        \"oldPrice\": 128.31,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"BOTH\",\n                        \"changedAt\": \"2026-03-02T23:44:21.802Z\"\n                    },\n                    {\n                        \"id\": 4906,\n                        \"price\": 128.31,\n                        \"oldPrice\": 128.63,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:43:53.616Z\"\n                    },\n                    {\n                        \"id\": 4888,\n                        \"price\": 128.63,\n                        \"oldPrice\": 139.65,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:43:24.889Z\"\n                    },\n                    {\n                        \"id\": 4870,\n                        \"price\": 139.65,\n                        \"oldPrice\": 147.15,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:42:56.286Z\"\n                    },\n                    {\n                        \"id\": 4852,\n                        \"price\": 147.15,\n                        \"oldPrice\": 151.67,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:42:27.538Z\"\n                    },\n                    {\n                        \"id\": 4834,\n                        \"price\": 151.67,\n                        \"oldPrice\": 157.1,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:41:59.700Z\"\n                    },\n                    {\n                        \"id\": 4816,\n                        \"price\": 157.1,\n                        \"oldPrice\": 154.34,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:41:30.337Z\"\n                    },\n                    {\n                        \"id\": 4798,\n                        \"price\": 154.34,\n                        \"oldPrice\": 154.89,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:41:01.990Z\"\n                    },\n                    {\n                        \"id\": 4780,\n                        \"price\": 154.89,\n                        \"oldPrice\": 151.11,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:40:33.819Z\"\n                    },\n                    {\n                        \"id\": 4762,\n                        \"price\": 151.11,\n                        \"oldPrice\": 147.36,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": false,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:40:05.076Z\"\n                    },\n                    {\n                        \"id\": 4744,\n                        \"price\": 147.36,\n                        \"oldPrice\": 150.08,\n                        \"currency\": \"USD\",\n                        \"availability\": false,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"BOTH\",\n                        \"changedAt\": \"2026-03-02T23:39:36.438Z\"\n                    },\n                    {\n                        \"id\": 4726,\n                        \"price\": 150.08,\n                        \"oldPrice\": 139.93,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:39:08.155Z\"\n                    },\n                    {\n                        \"id\": 4708,\n                        \"price\": 139.93,\n                        \"oldPrice\": 130.16,\n                        \"currency\": \"USD\",\n                        \"availability\": true,\n                        \"oldAvailability\": true,\n                        \"changeType\": \"PRICE_CHANGE\",\n                        \"changedAt\": \"2026-03-02T23:38:39.423Z\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Product Changes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products/changes?since={{since}}&minutes={{minutes}}&page={{page}}&limit={{limit}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products",
+            "changes"
+          ],
+          "query": [
+            {
+              "key": "since",
+              "value": "{{since}}"
+            },
+            {
+              "key": "minutes",
+              "value": "{{minutes}}"
+            },
+            {
+              "key": "page",
+              "value": "{{page}}"
+            },
+            {
+              "key": "limit",
+              "value": "{{limit}}"
+            }
+          ]
+        },
+        "description": "Returns recent price or availability changes from provider product history."
+      },
+      "response": [
+        {
+          "name": "Get Product Changes",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/changes?minutes={{minutes}}&page={{page}}&limit={{limit}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "changes"
+              ],
+              "query": [
+                {
+                  "key": "since",
+                  "value": "{{since}}",
+                  "disabled": true
+                },
+                {
+                  "key": "minutes",
+                  "value": "{{minutes}}"
+                },
+                {
+                  "key": "page",
+                  "value": "{{page}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "{{limit}}"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "3364"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"d24-KflAt8KDUA/2dJE05ed1qOrOSMQ\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 23:47:35 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"data\": [\n        {\n            \"id\": 5037,\n            \"productId\": 10,\n            \"productName\": \"Postgres Performance Lab\",\n            \"canonicalKey\": \"postgres-performance-lab\",\n            \"providerName\": \"provider-c\",\n            \"externalId\": \"prov-c-postgres-performance-lab\",\n            \"price\": 22.8,\n            \"oldPrice\": 20.67,\n            \"currency\": \"USD\",\n            \"availability\": false,\n            \"oldAvailability\": true,\n            \"changeType\": \"BOTH\",\n            \"changedAt\": \"2026-03-02T23:47:14.174Z\"\n        },\n        {\n            \"id\": 5036,\n            \"productId\": 9,\n            \"productName\": \"Event-Driven Systems\",\n            \"canonicalKey\": \"event-driven-systems\",\n            \"providerName\": \"provider-c\",\n            \"externalId\": \"prov-c-event-driven-systems\",\n            \"price\": 48.73,\n            \"oldPrice\": 47.59,\n            \"currency\": \"USD\",\n            \"availability\": true,\n            \"oldAvailability\": true,\n            \"changeType\": \"PRICE_CHANGE\",\n            \"changedAt\": \"2026-03-02T23:47:14.157Z\"\n        },\n        {\n            \"id\": 5035,\n            \"productId\": 4,\n            \"productName\": \"AWS Cloud Handbook\",\n            \"canonicalKey\": \"aws-cloud-handbook\",\n            \"providerName\": \"provider-c\",\n            \"externalId\": \"prov-c-aws-cloud-handbook\",\n            \"price\": 29.47,\n            \"oldPrice\": 33.37,\n            \"currency\": \"USD\",\n            \"availability\": true,\n            \"oldAvailability\": true,\n            \"changeType\": \"PRICE_CHANGE\",\n            \"changedAt\": \"2026-03-02T23:47:14.136Z\"\n        },\n        {\n            \"id\": 5034,\n            \"productId\": 3,\n            \"productName\": \"Docker Deep Dive\",\n            \"canonicalKey\": \"docker-deep-dive\",\n            \"providerName\": \"provider-c\",\n            \"externalId\": \"prov-c-docker-deep-dive\",\n            \"price\": 11.09,\n            \"oldPrice\": 12.74,\n            \"currency\": \"USD\",\n            \"availability\": true,\n            \"oldAvailability\": true,\n            \"changeType\": \"PRICE_CHANGE\",\n            \"changedAt\": \"2026-03-02T23:47:14.115Z\"\n        },\n        {\n            \"id\": 5033,\n            \"productId\": 2,\n            \"productName\": \"TypeScript Pro License\",\n            \"canonicalKey\": \"typescript-pro-license\",\n            \"providerName\": \"provider-c\",\n            \"externalId\": \"prov-c-typescript-pro-license\",\n            \"price\": 73.07,\n            \"oldPrice\": 76.34,\n            \"currency\": \"USD\",\n            \"availability\": true,\n            \"oldAvailability\": true,\n            \"changeType\": \"PRICE_CHANGE\",\n            \"changedAt\": \"2026-03-02T23:47:14.094Z\"\n        },\n        {\n            \"id\": 5032,\n            \"productId\": 1,\n            \"productName\": \"NestJS Masterclass\",\n            \"canonicalKey\": \"nestjs-masterclass\",\n            \"providerName\": \"provider-c\",\n            \"externalId\": \"prov-c-nestjs-masterclass\",\n            \"price\": 95.47,\n            \"oldPrice\": 102.25,\n            \"currency\": \"USD\",\n            \"availability\": true,\n            \"oldAvailability\": true,\n            \"changeType\": \"PRICE_CHANGE\",\n            \"changedAt\": \"2026-03-02T23:47:14.077Z\"\n        },\n        {\n            \"id\": 5031,\n            \"productId\": 8,\n            \"productName\": \"Secure Node.js Workshop\",\n            \"canonicalKey\": \"secure-node-js-workshop\",\n            \"providerName\": \"provider-b\",\n            \"externalId\": \"prov-b-secure-nodejs-workshop\",\n            \"price\": 33.47,\n            \"oldPrice\": 33.75,\n            \"currency\": \"USD\",\n            \"availability\": true,\n            \"oldAvailability\": true,\n            \"changeType\": \"PRICE_CHANGE\",\n            \"changedAt\": \"2026-03-02T23:47:14.059Z\"\n        },\n        {\n            \"id\": 5030,\n            \"productId\": 7,\n            \"productName\": \"Observability Playbook\",\n            \"canonicalKey\": \"observability-playbook\",\n            \"providerName\": \"provider-b\",\n            \"externalId\": \"prov-b-observability-playbook\",\n            \"price\": 21.63,\n            \"oldPrice\": 23.44,\n            \"currency\": \"USD\",\n            \"availability\": false,\n            \"oldAvailability\": false,\n            \"changeType\": \"PRICE_CHANGE\",\n            \"changedAt\": \"2026-03-02T23:47:14.032Z\"\n        },\n        {\n            \"id\": 5029,\n            \"productId\": 4,\n            \"productName\": \"AWS Cloud Handbook\",\n            \"canonicalKey\": \"aws-cloud-handbook\",\n            \"providerName\": \"provider-b\",\n            \"externalId\": \"prov-b-aws-cloud-handbook\",\n            \"price\": 16.9,\n            \"oldPrice\": 16.76,\n            \"currency\": \"USD\",\n            \"availability\": true,\n            \"oldAvailability\": false,\n            \"changeType\": \"BOTH\",\n            \"changedAt\": \"2026-03-02T23:47:14.013Z\"\n        },\n        {\n            \"id\": 5028,\n            \"productId\": 3,\n            \"productName\": \"Docker Deep Dive\",\n            \"canonicalKey\": \"docker-deep-dive\",\n            \"providerName\": \"provider-b\",\n            \"externalId\": \"prov-b-docker-deep-dive\",\n            \"price\": 11.16,\n            \"oldPrice\": 10.96,\n            \"currency\": \"USD\",\n            \"availability\": false,\n            \"oldAvailability\": false,\n            \"changeType\": \"PRICE_CHANGE\",\n            \"changedAt\": \"2026-03-02T23:47:13.985Z\"\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"total\": 1134,\n        \"totalPages\": 114,\n        \"hasNext\": true\n    }\n}"
+        }
+      ]
+    }
+  ]
+}
