@@ -2,30 +2,43 @@ import { ApiProperty } from '@nestjs/swagger';
 import { InternalProduct } from '../../interfaces';
 
 class ProviderBCostDto {
-  @ApiProperty({ example: 79.99 })
+  @ApiProperty({ description: 'Price amount', example: 79.99 })
   amount!: number;
 
-  @ApiProperty({ example: 'USD' })
+  @ApiProperty({ description: 'Three-letter currency code', example: 'USD' })
   currency!: string;
 }
 
 export class ProviderBProductResponseDto {
-  @ApiProperty({ example: 'prov-b-nestjs-masterclass' })
+  @ApiProperty({
+    description: 'Stock keeping unit identifier',
+    example: 'prov-b-nestjs-masterclass',
+  })
   sku: string;
 
-  @ApiProperty({ example: 'NestJS Masterclass' })
+  @ApiProperty({ description: 'Product title', example: 'NestJS Masterclass' })
   title: string;
 
-  @ApiProperty({ example: 'Advanced NestJS course for backend engineers.' })
+  @ApiProperty({
+    description: 'Product details text',
+    example: 'Advanced NestJS course for backend engineers.',
+  })
   details: string;
 
-  @ApiProperty({ type: ProviderBCostDto })
+  @ApiProperty({ description: 'Nested pricing object', type: ProviderBCostDto })
   cost: ProviderBCostDto;
 
-  @ApiProperty({ example: 'in_stock', enum: ['in_stock', 'out_of_stock'] })
+  @ApiProperty({
+    description: 'Current stock status',
+    example: 'in_stock',
+    enum: ['in_stock', 'out_of_stock'],
+  })
   stockStatus: 'in_stock' | 'out_of_stock';
 
-  @ApiProperty({ example: '2026-02-28T12:00:00Z' })
+  @ApiProperty({
+    description: 'ISO 8601 timestamp of last update',
+    example: '2026-02-28T12:00:00Z',
+  })
   updated_at: string;
 
   constructor(product: InternalProduct) {

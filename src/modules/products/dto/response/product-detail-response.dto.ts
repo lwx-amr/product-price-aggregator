@@ -3,28 +3,33 @@ import { ApiProperty } from '@nestjs/swagger';
 import { OfferWithHistoryResponseDto } from './offer-with-history-response.dto';
 
 export class ProductDetailResponseDto {
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ description: 'Canonical product ID', example: 1 })
   id: number;
 
-  @ApiProperty({ example: 'nestjs-masterclass' })
+  @ApiProperty({
+    description: 'Slugified key shared across providers',
+    example: 'nestjs-masterclass',
+  })
   canonicalKey: string;
 
-  @ApiProperty({ example: 'NestJS Masterclass' })
+  @ApiProperty({ description: 'Product display name', example: 'NestJS Masterclass' })
   name: string;
 
   @ApiProperty({
+    description: 'Short product summary',
     example: 'Advanced NestJS course for backend engineers.',
     nullable: true,
   })
   description: string | null;
 
-  @ApiProperty({ example: '2026-03-02T09:00:00.000Z' })
+  @ApiProperty({ description: 'Record creation timestamp', example: '2026-03-02T09:00:00.000Z' })
   createdAt: Date;
 
-  @ApiProperty({ example: '2026-03-02T10:00:00.000Z' })
+  @ApiProperty({ description: 'Last record update timestamp', example: '2026-03-02T10:00:00.000Z' })
   updatedAt: Date;
 
   @ApiProperty({
+    description: 'Provider-specific offers with recent price history',
     type: OfferWithHistoryResponseDto,
     isArray: true,
   })

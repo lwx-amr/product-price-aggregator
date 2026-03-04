@@ -14,15 +14,18 @@ export const envSchema = z
     DB_PASSWORD: z.string(),
     DB_NAME: z.string(),
 
+    // Security
+    ALLOWED_ORIGINS: z.string(),
+
     // Swagger
     SWAGGER_PATH: z.string(),
     API_KEY: z.string().min(1),
-    THROTTLE_SHORT_TTL: z.coerce.number().int().positive().default(1000),
-    THROTTLE_SHORT_LIMIT: z.coerce.number().int().positive().default(10),
-    THROTTLE_MEDIUM_TTL: z.coerce.number().int().positive().default(60000),
-    THROTTLE_MEDIUM_LIMIT: z.coerce.number().int().positive().default(100),
-    THROTTLE_LONG_TTL: z.coerce.number().int().positive().default(3600000),
-    THROTTLE_LONG_LIMIT: z.coerce.number().int().positive().default(1000),
+    THROTTLE_SHORT_TTL: z.coerce.number().int().positive(),
+    THROTTLE_SHORT_LIMIT: z.coerce.number().int().positive(),
+    THROTTLE_MEDIUM_TTL: z.coerce.number().int().positive(),
+    THROTTLE_MEDIUM_LIMIT: z.coerce.number().int().positive(),
+    THROTTLE_LONG_TTL: z.coerce.number().int().positive(),
+    THROTTLE_LONG_LIMIT: z.coerce.number().int().positive(),
 
     // Simulated providers
     SIM_MUTATION_INTERVAL_MS: z.coerce.number().int().positive(),

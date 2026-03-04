@@ -2,25 +2,35 @@ import { ApiProperty } from '@nestjs/swagger';
 import { InternalProduct } from '../../interfaces';
 
 export class ProviderCProductResponseDto {
-  @ApiProperty({ example: 'prov-c-nestjs-masterclass' })
+  @ApiProperty({
+    description: 'Provider C product identifier',
+    example: 'prov-c-nestjs-masterclass',
+  })
   productId: string;
 
-  @ApiProperty({ example: 'NestJS Masterclass' })
+  @ApiProperty({ description: 'Product name', example: 'NestJS Masterclass' })
   productName: string;
 
-  @ApiProperty({ example: 'Advanced NestJS course for backend engineers.' })
+  @ApiProperty({
+    description: 'Product description',
+    example: 'Advanced NestJS course for backend engineers.',
+  })
   desc: string;
 
-  @ApiProperty({ example: 7999 })
+  @ApiProperty({ description: 'Price expressed in cents', example: 7999 })
   priceInCents: number;
 
-  @ApiProperty({ example: 'USD' })
+  @ApiProperty({ description: 'Three-letter currency code', example: 'USD' })
   currencyCode: string;
 
-  @ApiProperty({ example: 1, enum: [0, 1] })
+  @ApiProperty({
+    description: 'Availability flag (1 = available, 0 = unavailable)',
+    example: 1,
+    enum: [0, 1],
+  })
   isAvailable: 0 | 1;
 
-  @ApiProperty({ example: 1772280000000 })
+  @ApiProperty({ description: 'Last update as Unix epoch in milliseconds', example: 1772280000000 })
   last_updated_epoch: number;
 
   constructor(product: InternalProduct) {

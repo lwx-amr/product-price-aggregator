@@ -3,22 +3,27 @@ import { ApiProperty } from '@nestjs/swagger';
 import { OfferResponseDto } from './offer-response.dto';
 
 export class ProductResponseDto {
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ description: 'Canonical product ID', example: 1 })
   id: number;
 
-  @ApiProperty({ example: 'nestjs-masterclass' })
+  @ApiProperty({
+    description: 'Slugified key shared across providers',
+    example: 'nestjs-masterclass',
+  })
   canonicalKey: string;
 
-  @ApiProperty({ example: 'NestJS Masterclass' })
+  @ApiProperty({ description: 'Product display name', example: 'NestJS Masterclass' })
   name: string;
 
   @ApiProperty({
+    description: 'Short product summary',
     example: 'Advanced NestJS course for backend engineers.',
     nullable: true,
   })
   description: string | null;
 
   @ApiProperty({
+    description: 'Provider-specific offers for this product',
     type: OfferResponseDto,
     isArray: true,
   })

@@ -1,0 +1,2 @@
+export const TRANSACTION_TIMEOUT_MS = 10_000;
+export const TRANSACTION_MAX_WAIT_MS = 10_000;

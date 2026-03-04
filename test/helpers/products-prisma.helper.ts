@@ -1,5 +1,6 @@
 export interface MockProductsPrismaService {
   provider: {
+    findMany: jest.Mock;
     upsert: jest.Mock;
   };
   product: {
@@ -35,6 +36,7 @@ export interface MockProductsPrismaTransactionClient {
 export function createMockProductsPrismaService(): MockProductsPrismaService {
   return {
     provider: {
+      findMany: jest.fn(),
       upsert: jest.fn(),
     },
     product: {

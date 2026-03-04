@@ -2,25 +2,34 @@ import { ApiProperty } from '@nestjs/swagger';
 import { InternalProduct } from '../../interfaces';
 
 export class ProviderAProductResponseDto {
-  @ApiProperty({ example: 'prov-a-nestjs-masterclass' })
+  @ApiProperty({
+    description: 'Provider A product identifier',
+    example: 'prov-a-nestjs-masterclass',
+  })
   id: string;
 
-  @ApiProperty({ example: 'NestJS Masterclass' })
+  @ApiProperty({ description: 'Product display name', example: 'NestJS Masterclass' })
   name: string;
 
-  @ApiProperty({ example: 'Advanced NestJS course for backend engineers.' })
+  @ApiProperty({
+    description: 'Short product summary',
+    example: 'Advanced NestJS course for backend engineers.',
+  })
   description: string;
 
-  @ApiProperty({ example: 79.99 })
+  @ApiProperty({ description: 'Current price in the given currency', example: 79.99 })
   price: number;
 
-  @ApiProperty({ example: 'USD' })
+  @ApiProperty({ description: 'Three-letter currency code', example: 'USD' })
   currency: string;
 
-  @ApiProperty({ example: true })
+  @ApiProperty({ description: 'Whether the product is currently available', example: true })
   available: boolean;
 
-  @ApiProperty({ example: '2026-02-28T12:00:00.000Z' })
+  @ApiProperty({
+    description: 'ISO 8601 timestamp of last data update',
+    example: '2026-02-28T12:00:00.000Z',
+  })
   lastUpdated: string;
 
   constructor(product: InternalProduct) {

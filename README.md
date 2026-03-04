@@ -19,7 +19,7 @@ The service collects data in real-time from external APIs, normalizes it, stores
 - Yarn
 - Docker & Docker Compose (for PostgreSQL)
 
-### Setup
+### Setup (Local App + Dockerized PostgreSQL)
 
 1. Clone the repo and install dependencies:
 
@@ -33,10 +33,10 @@ yarn install
 cp .env.example .env
 ```
 
-3. Start PostgreSQL with Docker:
+3. Start only PostgreSQL in Docker:
 
 ```bash
-yarn docker:up
+docker compose up -d db
 ```
 
 4. Run Prisma migrations to set up the database:
@@ -53,19 +53,188 @@ yarn start:dev
 
 The app will be running on `http://localhost:3398`.
 
-### Docker Scripts
+### Setup (Full Docker Compose Stack)
 
-| Script                 | What it does                       |
-| ---------------------- | ---------------------------------- |
-| `yarn docker:up`       | Start all containers in background |
-| `yarn docker:down`     | Stop and remove containers         |
-| `yarn docker:logs`     | Follow app container logs          |
-| `yarn docker:build`    | Build containers                   |
-| `yarn docker:restart`  | Restart app container              |
-| `yarn docker:no-cache` | Rebuild containers without cache   |
-| `yarn prisma:migrate`  | Run Prisma migrations              |
-| `yarn prisma:generate` | Regenerate Prisma Client           |
-| `yarn prisma:studio`   | Open Prisma Studio (DB browser)    |
+If you want to run both PostgreSQL and the Nest app in containers instead of running the app locally:
+
+```bash
+yarn docker:up
+```
+
+Migrations run automatically on container start, so the database is ready to go.
+
+The app will be available on `http://localhost:3398`.
+
+If you add or remove dependencies, rebuild the app image before starting the stack again:
+
+```bash
+docker compose --profile dev up -d --build
+```
+
+There is also a production profile that uses a multi-stage Dockerfile with a smaller image, non-root user, and `dumb-init` for proper signal handling:
+
+```bash
+yarn docker:prod:up
+```
+
+### Tests
+
+Run the unit tests:
+
+```bash
+yarn test
+```
+
+Run the HTTP integration tests for the product endpoints:
+
+```bash
+yarn test:e2e
+```
+
+### Docker and Prisma Scripts
+
+| Script                      | What it does                            |
+| --------------------------- | --------------------------------------- |
+| `yarn docker:up`            | Start dev containers (db + app)         |
+| `yarn docker:down`          | Stop and remove dev containers          |
+| `yarn docker:logs`          | Follow dev app container logs           |
+| `yarn docker:build`         | Build dev containers                    |
+| `yarn docker:restart`       | Restart dev app container               |
+| `yarn docker:no-cache`      | Rebuild dev containers without cache    |
+| `yarn docker:prod:up`       | Start production containers (db + app)  |
+| `yarn docker:prod:down`     | Stop and remove production containers   |
+| `yarn docker:prod:logs`     | Follow production app container logs    |
+| `yarn docker:prod:build`    | Build production containers             |
+| `yarn docker:prod:no-cache` | Rebuild production containers, no cache |
+| `yarn prisma:migrate`       | Run Prisma migrations                   |
+| `yarn prisma:generate`      | Regenerate Prisma Client                |
+| `yarn prisma:studio`        | Open Prisma Studio (DB browser)         |
+
+## Directory Structure
+
+```
+src/
+├── config/                          # Zod env schema and config exports
+├── core/                            # Shared building blocks used across all modules
+│   ├── constants/                   # App-wide constants (API key header, etc.)
+│   ├── decorators/                  # Custom decorators (@Public, @SwaggerApiPaginatedQuery)
+│   ├── dtos/                        # Base DTOs (PaginationQueryDto, PageMetaDto)
+│   ├── enums/                       # Shared enums (NodeEnvironment, etc.)
+│   ├── factories/                   # ResponseFactory for consistent API responses
+│   ├── filters/                     # Global HttpExceptionFilter
+│   ├── guards/                      # ApiKeyGuard
+│   ├── interceptors/                # Request logging interceptor
+│   ├── interfaces/                  # Shared type definitions
+│   └── swagger/                     # Reusable Swagger schema helpers
+├── module-options/                  # NestJS module configuration factories
+├── modules/
+│   ├── aggregation/                 # Aggregation engine (scheduler, persistence, events)
+│   │   ├── constants/
+│   │   ├── events/
+│   │   ├── interfaces/
+│   │   └── services/
+│   ├── database/                    # PrismaService and DB constants
+│   ├── health/                      # Health check endpoint
+│   ├── product-stream/              # SSE event bridge (listens to aggregation events)
+│   ├── products/                    # Products REST API (list, detail, changes)
+│   │   ├── dto/
+│   │   │   ├── request/
+│   │   │   └── response/
+│   │   └── interfaces/
+│   ├── providers/                   # Provider adapters and HTTP client factory
+│   │   ├── adapters/                # Per-provider normalization (A, B, C)
+│   │   ├── constants/
+│   │   └── interfaces/
+│   ├── shared/                      # SharedModule (HttpClientFactory with retry/backoff)
+│   ├── simulated-providers/         # Fake upstream APIs for local development
+│   │   ├── controllers/
+│   │   ├── data/
+│   │   ├── dto/
+│   │   └── services/
+│   └── streams/                     # SSE controller and HTML viewer
+├── app.module.ts
+├── bootstrap.ts                     # Swagger, pipes, prefix — reused in e2e tests
+└── main.ts
+
+test/
+├── helpers/                         # Prisma mock helpers and test factories
+└── products.e2e-spec.ts             # Integration tests for product endpoints
+
+prisma/
+├── migrations/
+└── schema.prisma
+```
+
+## Conventions
+
+### File and Directory Naming
+
+- **Files**: kebab-case with type suffix — `aggregation-persistence.service.ts`, `get-products-query.dto.ts`, `api-key.guard.ts`
+- **Classes**: PascalCase — `AggregationPersistenceService`, `GetProductsQueryDto`, `ApiKeyGuard`
+- **Constants**: UPPER_SNAKE_CASE — `API_KEY_HEADER`, `TRANSACTION_TIMEOUT_MS`
+- **Barrel exports**: Each subdirectory has an `index.ts` that re-exports its contents. Module root directories (`products/`, `aggregation/`) and `src/` itself do not get barrel files.
+
+### Module Organization
+
+Each feature module lives under `src/modules/<feature>/` and follows a consistent layout:
+
+- `<feature>.module.ts` — NestJS module definition
+- `<feature>.controller.ts` — route handlers (if the module exposes HTTP endpoints)
+- `services/` — business logic
+- `dto/request/` and `dto/response/` — input validation and output shaping
+- `interfaces/` — TypeScript types scoped to the module
+- `constants/` — module-specific constants
+
+### Routing
+
+All controllers are prefixed with `api/v1` globally in `bootstrap.ts`. Controller-level decorators only specify the resource name (e.g. `@Controller('products')`), so the full path becomes `api/v1/products`.
+
+### Response Format
+
+All API responses go through `ResponseFactory`:
+
+- `ResponseFactory.data(item)` — single item: `{ data: T }`
+- `ResponseFactory.dataArray(items)` — list: `{ data: T[] }`
+- `ResponseFactory.dataPage(items, meta)` — paginated: `{ data: T[], meta: { page, limit, total, totalPages } }`
+
+### Error Responses
+
+A global `HttpExceptionFilter` normalizes every error into one shape:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Validation failed",
+  "error": "Bad Request",
+  "timestamp": "2026-03-04T10:00:00.000Z"
+}
+```
+
+Validation errors keep their message arrays intact so clients can render field-level feedback.
+
+### Path Aliases
+
+TypeScript path aliases are configured in `tsconfig.json` and used everywhere instead of relative imports:
+
+| Alias             | Maps to              |
+| ----------------- | -------------------- |
+| `@/*`             | `src/*`              |
+| `@core/*`         | `src/core/*`         |
+| `@modules/*`      | `src/modules/*`      |
+| `@config`         | `src/config`         |
+| `@module-options` | `src/module-options` |
+| `@test/*`         | `test/*`             |
+
+### Testing
+
+- **Unit tests**: colocated with source files as `*.spec.ts`
+- **Integration tests**: in `test/` as `*.e2e-spec.ts`, using the same bootstrap setup as the real app
+- **Test helpers**: shared mocks and factories live in `test/helpers/`
+
+### Guards and Security
+
+- `@Public()` decorator opts endpoints out of API key validation
+- Guard execution order: API key guard runs before rate limiter, so unauthorized requests are rejected without consuming rate-limit budget
 
 ## Environment Variables
 
@@ -94,8 +263,8 @@ erDiagram
         string name UK
         string base_url
         boolean is_active
-        datetime created_at
-        datetime updated_at
+        timestamptz created_at
+        timestamptz updated_at
     }
 
     Product {
@@ -103,8 +272,8 @@ erDiagram
         string canonical_key UK
         string name
         string description
-        datetime created_at
-        datetime updated_at
+        timestamptz created_at
+        timestamptz updated_at
     }
 
     ProviderProduct {
@@ -115,11 +284,11 @@ erDiagram
         decimal price
         Currency currency
         boolean availability
-        datetime source_last_updated
-        datetime fetched_at
+        timestamptz source_last_updated
+        timestamptz fetched_at
         boolean is_stale
-        datetime created_at
-        datetime updated_at
+        timestamptz created_at
+        timestamptz updated_at
     }
 
     ProviderProductHistory {
@@ -131,7 +300,7 @@ erDiagram
         boolean availability
         boolean old_availability
         ChangeType change_type
-        datetime changed_at
+        timestamptz changed_at
     }
 
     Provider ||--o{ ProviderProduct : "has many"
@@ -147,7 +316,7 @@ erDiagram
 ## Design Decisions
 
 - **Zod for env validation**: I prefer Zod over Joi because it gives better TypeScript inference out of the box. The ConfigService is fully typed so you get autocomplete on `config.get('VARIABLE_NAME')`.
-- **Docker Compose**: PostgreSQL runs in a container to keep the local setup simple. The app can run either locally or in a container too.
+- **Docker Compose**: PostgreSQL runs in a container to keep the local setup simple. For local development, I start only `db` with Docker and run the Nest app locally. There is also a full-container workflow via `yarn docker:up` when you want both `db` and `app` in Docker.
 - **Bootstrap separation**: The bootstrap logic (Swagger, pipes, etc.) is in a separate file from `main.ts`. This makes it easier to reuse the same setup in e2e tests without duplicating code.
 - **Global ValidationPipe**: Registered as `APP_PIPE` automatically validate and sanitize all incoming requests.
 - **Global exception filter**: All HTTP errors now use one response shape with `statusCode`, `message`, `error`, and `timestamp`. Validation errors keep their message arrays untouched so clients can render them cleanly.
@@ -172,3 +341,15 @@ erDiagram
 - **History cap on detail endpoint**: `GET /products/:id` returns only the latest 20 history entries per offer instead of paginating them. This keeps the payload small without adding the complexity of nested pagination. For most use cases, the recent history is what matters.
 - **Changes endpoint excludes INITIAL**: `GET /products/changes` only returns actual changes (price, availability, or both). The `INITIAL` change type (first time a product is seen) is excluded since it is not a real change from the consumer's perspective.
 - **No offer cap on listing**: `GET /products` does not limit the number of offers per product. With only three simulated providers this is not an issue. In production with many providers, you would add a `take` limit on the offers query.
+
+## Future Improvements
+
+Things I would add in a production version of this service but skipped here to keep scope realistic for the assignment:
+
+- **Stricter authentication and authorization**: The current `x-api-key` guard is intentionally minimal for this assignment. In production I would replace or complement it with a stronger scheme such as signed service-to-service tokens, scoped API keys with rotation/expiry, or JWT/OAuth2 depending on the consumer model.
+- **Job queue for aggregation**: The current scheduler uses a simple `setInterval` with an in-memory mutex. In production I would replace this with BullMQ backed by Redis, so aggregation jobs survive restarts, can be retried independently per provider, and scale horizontally across multiple workers. Each provider fetch would be its own job, with dead-letter queues for repeated failures.
+- **Caching layer**: There is no caching right now — every API request hits the database directly. Adding a Redis cache (or even NestJS `CacheModule` with an in-memory store) for the product listing and detail endpoints would reduce database load significantly, especially for read-heavy consumers. Cache invalidation would be straightforward since we already emit change events after persistence.
+- **History table partitioning and archival**: The `provider_product_history` table grows indefinitely. In production, I would partition it by time (e.g. monthly ranges using PostgreSQL native partitioning) and archive old partitions to cold storage. This keeps query performance stable as the table grows and reduces storage costs.
+- **BigInt primary keys**: All tables currently use 32-bit `Int` primary keys. For a high-volume history table, migrating to `BigInt` would prevent eventual ID exhaustion. Skipped for now since the data volume in this assignment is small.
+- **Cursor-based pagination for changes**: The `/products/changes` endpoint uses offset pagination, which degrades on large append-only tables. Cursor-based pagination (using `id` as cursor) would give consistent performance regardless of page depth. Not implemented yet since the current data volume does not warrant it.
+- **Observability**: No metrics or tracing beyond request logging. Adding Prometheus metrics (aggregation cycle duration, provider latency histograms, error rates) and OpenTelemetry tracing would make the service production-observable. The SSE event count and database transaction times are also worth tracking.

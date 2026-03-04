@@ -1,8 +1,8 @@
 import { ChangeType, Currency, Prisma } from '.prisma/client';
 import { ProviderName } from '@core/enums';
 import { PrismaService } from '@modules/database/prisma.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import type { NormalizedProviderProduct } from '@modules/providers/interfaces';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getLoggerToken } from 'nestjs-pino';
 import {
@@ -51,11 +51,19 @@ describe('AggregationPersistenceService', () => {
       emit: jest.fn(),
     };
 
-    prismaService.$transaction.mockImplementation(
-      async (callback: (client: typeof tx) => unknown) => callback(tx),
-    );
+    prismaService.$transaction.mockImplementation(async (arg: unknown) => {
+      if (typeof arg === 'function') {
+        return (arg as (client: typeof tx) => unknown)(tx);
+      }
 
-    const moduleBuilder = Test.createTestingModule({
+      if (Array.isArray(arg)) {
+        return Promise.all(arg);
+      }
+
+      throw new Error('Unsupported transaction payload in test');
+    });
+
+    module = await Test.createTestingModule({
       providers: [
         AggregationPersistenceService,
         {
@@ -71,18 +79,16 @@ describe('AggregationPersistenceService', () => {
           useValue: eventEmitter,
         },
       ],
-    })
-      .overrideProvider(PrismaService)
-      .useValue(prismaService);
-
-    module = await moduleBuilder.compile();
+    }).compile();
 
     service = module.get<AggregationPersistenceService>(AggregationPersistenceService);
   });
 
   beforeEach(() => {
     prismaService.provider.upsert.mockReset();
+    prismaService.provider.findMany.mockReset();
     prismaService.product.upsert.mockReset();
+    prismaService.product.findMany.mockReset();
     prismaService.providerProduct.updateMany.mockReset();
     prismaService.$transaction.mockClear();
     tx.providerProduct.findUnique.mockReset();
@@ -95,12 +101,27 @@ describe('AggregationPersistenceService', () => {
       name: normalizedItem.providerName,
       baseUrl: normalizedItem.providerBaseUrl,
     });
+    prismaService.provider.findMany.mockResolvedValue([
+      {
+        id: 1,
+        name: normalizedItem.providerName,
+        baseUrl: normalizedItem.providerBaseUrl,
+      },
+    ]);
     prismaService.product.upsert.mockResolvedValue({
       id: 10,
       canonicalKey: normalizedItem.canonicalKey,
       name: normalizedItem.name,
       description: normalizedItem.description,
     });
+    prismaService.product.findMany.mockResolvedValue([
+      {
+        id: 10,
+        canonicalKey: normalizedItem.canonicalKey,
+        name: normalizedItem.name,
+        description: normalizedItem.description,
+      },
+    ]);
     prismaService.providerProduct.updateMany.mockResolvedValue({ count: 0 });
   });
 
@@ -118,7 +139,7 @@ describe('AggregationPersistenceService', () => {
     tx.providerProduct.findUnique.mockResolvedValue(null);
     tx.providerProduct.create.mockResolvedValue({ id: 100 });
 
-    await service.persistItem(normalizedItem);
+    await service.persistBatch([normalizedItem]);
 
     expect(prismaService.provider.upsert).toHaveBeenCalledWith({
       where: { name: normalizedItem.providerName },
@@ -128,7 +149,28 @@ describe('AggregationPersistenceService', () => {
         baseUrl: normalizedItem.providerBaseUrl,
       },
     });
-    expect(tx.providerProduct.create).toHaveBeenCalled();
+    expect(prismaService.product.upsert).toHaveBeenCalledWith({
+      where: { canonicalKey: normalizedItem.canonicalKey },
+      update: {},
+      create: {
+        canonicalKey: normalizedItem.canonicalKey,
+        name: normalizedItem.name,
+        description: normalizedItem.description,
+      },
+    });
+    expect(tx.providerProduct.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          providerId: 1,
+          productId: 10,
+          externalId: normalizedItem.externalId,
+          price: new Prisma.Decimal('79.99'),
+          currency: Currency.USD,
+          availability: true,
+          isStale: false,
+        }),
+      }),
+    );
     expect(tx.providerProductHistory.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
@@ -149,7 +191,7 @@ describe('AggregationPersistenceService', () => {
       availability: false,
     });
 
-    await service.persistItem(normalizedItem);
+    await service.persistBatch([normalizedItem]);
 
     expect(tx.providerProductHistory.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -194,7 +236,7 @@ describe('AggregationPersistenceService', () => {
       availability: true,
     });
 
-    await service.persistItem(normalizedItem);
+    await service.persistBatch([normalizedItem]);
 
     expect(tx.providerProductHistory.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -203,6 +245,12 @@ describe('AggregationPersistenceService', () => {
           changeType: ChangeType.PRICE_CHANGE,
           oldAvailability: true,
         }),
+      }),
+    );
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      AggregationEvent.PRODUCT_CHANGE,
+      expect.objectContaining({
+        changeType: ChangeType.PRICE_CHANGE,
       }),
     );
   });
@@ -214,7 +262,7 @@ describe('AggregationPersistenceService', () => {
       availability: false,
     });
 
-    await service.persistItem(normalizedItem);
+    await service.persistBatch([normalizedItem]);
 
     expect(tx.providerProductHistory.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -226,6 +274,12 @@ describe('AggregationPersistenceService', () => {
         }),
       }),
     );
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      AggregationEvent.PRODUCT_CHANGE,
+      expect.objectContaining({
+        changeType: ChangeType.AVAILABILITY_CHANGE,
+      }),
+    );
   });
 
   it('does not emit a product change event when the current values are unchanged', async () => {
@@ -235,9 +289,20 @@ describe('AggregationPersistenceService', () => {
       availability: true,
     });
 
-    await service.persistItem(normalizedItem);
+    await service.persistBatch([normalizedItem]);
 
     expect(tx.providerProductHistory.create).not.toHaveBeenCalled();
+    expect(tx.providerProduct.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 100 },
+        data: expect.objectContaining({
+          price: new Prisma.Decimal('79.99'),
+          currency: Currency.USD,
+          availability: true,
+          isStale: false,
+        }),
+      }),
+    );
     expect(eventEmitter.emit).not.toHaveBeenCalled();
   });
 
@@ -248,6 +313,7 @@ describe('AggregationPersistenceService', () => {
     expect(prismaService.providerProduct.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
+          fetchedAt: expect.objectContaining({ lt: expect.any(Date) }),
           isStale: false,
         }),
         data: {
@@ -272,16 +338,26 @@ describe('AggregationPersistenceService', () => {
     expect(tx.providerProduct.create).toHaveBeenCalledTimes(1);
   });
 
-  it('throws for invalid prices before starting persistence', async () => {
+  it('logs invalid prices and skips persistence for those items', async () => {
     const invalidPriceItem: NormalizedProviderProduct = {
       ...normalizedItem,
       price: '0',
     };
 
-    await expect(service.persistItem(invalidPriceItem)).rejects.toThrow(
-      `Invalid price "0" for ${normalizedItem.providerName}:${normalizedItem.externalId}`,
+    await expect(service.persistBatch([invalidPriceItem])).resolves.toBeUndefined();
+
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        providerName: normalizedItem.providerName,
+        externalId: normalizedItem.externalId,
+        canonicalKey: normalizedItem.canonicalKey,
+        err: expect.any(Error),
+      }),
+      'Failed to persist normalized provider product',
     );
-    expect(prismaService.provider.upsert).not.toHaveBeenCalled();
-    expect(prismaService.product.upsert).not.toHaveBeenCalled();
+    expect(tx.providerProduct.create).not.toHaveBeenCalled();
+    expect(tx.providerProduct.update).not.toHaveBeenCalled();
+    expect(tx.providerProductHistory.create).not.toHaveBeenCalled();
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
   });
 });
