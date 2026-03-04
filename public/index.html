@@ -71,13 +71,32 @@
         const availClass = c.availability ? 'available' : 'unavailable';
         const badgeClass = c.changeType === 'BOTH' ? 'both' : c.changeType === 'PRICE_CHANGE' ? 'price' : 'availability';
 
-        row.innerHTML =
-          '<td>' + new Date(c.changedAt).toLocaleTimeString() + '</td>' +
-          '<td>' + c.productName + '</td>' +
-          '<td>' + c.providerName + '</td>' +
-          '<td>' + c.oldPrice + ' &rarr; ' + c.price + ' ' + c.currency + '</td>' +
-          '<td><span class="' + availClass + '">' + c.oldAvailability + ' &rarr; ' + c.availability + '</span></td>' +
-          '<td><span class="badge ' + badgeClass + '">' + c.changeType.replace('_', ' ') + '</span></td>';
+        const cells = [
+          new Date(c.changedAt).toLocaleTimeString(),
+          c.productName,
+          c.providerName,
+          c.oldPrice + ' \u2192 ' + c.price + ' ' + c.currency,
+        ];
+
+        cells.forEach(function (text) {
+          var td = document.createElement('td');
+          td.textContent = text;
+          row.appendChild(td);
+        });
+
+        var availTd = document.createElement('td');
+        var availSpan = document.createElement('span');
+        availSpan.className = availClass;
+        availSpan.textContent = c.oldAvailability + ' \u2192 ' + c.availability;
+        availTd.appendChild(availSpan);
+        row.appendChild(availTd);
+
+        var typeTd = document.createElement('td');
+        var typeSpan = document.createElement('span');
+        typeSpan.className = 'badge ' + badgeClass;
+        typeSpan.textContent = c.changeType.replace('_', ' ');
+        typeTd.appendChild(typeSpan);
+        row.appendChild(typeTd);
 
         tableBody.prepend(row);
 

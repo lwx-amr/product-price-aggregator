@@ -8,7 +8,7 @@ services:
       - "${DB_PORT:-5433}:5432"
     environment:
       POSTGRES_USER: ${DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-Password123}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME:-products-service}
     volumes:
       - products-postgres-data:/var/lib/postgresql/data
@@ -33,9 +33,11 @@ services:
     environment:
       - DB_HOST=db
       - DB_PORT=5432
+      - DATABASE_URL=postgresql://${DB_USERNAME:-postgres}:${DB_PASSWORD}@db:5432/${DB_NAME:-products-service}
     volumes:
       - ./src:/app/src
       - ./prisma:/app/prisma
+      - ./prisma.config.ts:/app/prisma.config.ts
       - ./tsconfig.json:/app/tsconfig.json
       - ./tsconfig.build.json:/app/tsconfig.build.json
       - ./public:/app/public
@@ -46,7 +48,30 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: sh -c "yarn install && yarn start:dev"
+    command: sh -c "yarn install && yarn prisma:deploy && yarn start:dev"
+    profiles:
+      - dev
+
+  # Application (Production Mode)
+  app-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: products-service-prod
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3398}:3398"
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - NODE_ENV=production
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - production
 
 volumes:
   products-postgres-data:
