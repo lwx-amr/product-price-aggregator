@@ -77,6 +77,14 @@ Swagger UI is available at `http://localhost:3398/api/docs` once the app is runn
 
 The docs page itself loads without authentication, but "Try it out" calls require a valid `x-api-key` header. Click the **Authorize** button in Swagger UI and enter your `API_KEY` value to unlock the protected endpoints.
 
+## Realtime Viewer
+
+There is also a minimal SSE viewer at `http://localhost:3398/api/v1/streams/viewer`.
+
+- The SSE stream endpoint is `GET /api/v1/streams/products`
+- This stream is public for now by decision
+- The stream emits `product-change` events when price or availability changes, plus a heartbeat event every 30 seconds to keep the connection alive
+
 ## Database Schema
 
 ```mermaid
@@ -155,6 +163,7 @@ erDiagram
 - **Aggregation engine**: The aggregation module fetches every provider concurrently with `Promise.allSettled`, so one upstream failure never blocks the rest of the cycle. Persistence stays sequential on purpose because multiple normalized items can share the same provider or canonical product, and sequential upserts avoid unnecessary races on unique keys while keeping the implementation simple for this assignment.
 - **Overlap-safe scheduler**: The aggregation cycle starts immediately on boot, then repeats on a configurable interval. A simple in-memory mutex prevents overlapping cycles if one run takes longer than the interval. This keeps the behavior deterministic without adding queueing complexity the assignment does not ask for.
 - **History tracking**: We only create `ProviderProductHistory` rows when price or availability actually changes. The history insert and current-state update happen inside the same Prisma transaction so we do not end up with partial state if a write fails in the middle.
+- **Post-commit SSE emission**: Realtime change events are emitted only after the persistence transaction commits successfully. This avoids broadcasting a change that later rolls back in the database.
 - **Products API filtering**: On `GET /products`, the `name` filter applies to the canonical product, while `provider`, `availability`, `minPrice`, `maxPrice`, and `stale` apply to offers. A product is returned only when at least one offer matches, and the response includes only the matching offers. This keeps the API behavior predictable and avoids returning unrelated offers after filtering.
 - **Detail vs listing behavior**: The list endpoint is intentionally selective, but `GET /products/:id` is intentionally complete. It returns all offers for that product, including stale ones, so clients can decide how to present them. To keep the payload under control, each offer includes only the latest 20 history entries.
 - **Product upsert — first provider wins**: When upserting the canonical `Product`, we only set `name` and `description` on the initial insert. Subsequent providers with the same `canonicalKey` do not overwrite these fields. This avoids the "last writer wins" problem where the canonical product's metadata would change arbitrarily depending on which provider happened to be processed last. In a production system you might want a preferred-provider strategy or a manual curation step.

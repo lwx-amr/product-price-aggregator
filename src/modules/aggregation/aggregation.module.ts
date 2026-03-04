@@ -1,6 +1,7 @@
 import { PrismaModule } from '@modules/database/prisma.module';
 import { ProvidersModule } from '@modules/providers/providers.module';
 import { Module } from '@nestjs/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import {
   AggregationPersistenceService,
   AggregationSchedulerService,
@@ -8,7 +9,7 @@ import {
 } from './services';
 
 @Module({
-  imports: [ProvidersModule, PrismaModule],
+  imports: [ProvidersModule, PrismaModule, EventEmitterModule],
   providers: [AggregationService, AggregationPersistenceService, AggregationSchedulerService],
 })
 export class AggregationModule {}

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Product Changes Stream</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 960px; margin: 0 auto; padding: 24px; color: #1a1a1a; background: #fafafa; }
+      h1 { font-size: 1.4rem; margin-bottom: 4px; }
+      .subtitle { color: #666; font-size: 0.85rem; margin-bottom: 16px; }
+      .status { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; margin-bottom: 16px; }
+      .status.connected { background: #d4edda; color: #155724; }
+      .status.disconnected { background: #f8d7da; color: #721c24; }
+      table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: #fff; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+      th { background: #f0f0f0; text-align: left; padding: 10px 12px; font-weight: 600; border-bottom: 2px solid #ddd; }
+      td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+      tr:hover td { background: #f9f9f9; }
+      .empty { text-align: center; color: #999; padding: 32px; }
+      .badge { display: inline-block; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+      .badge.price { background: #e3f2fd; color: #1565c0; }
+      .badge.availability { background: #fff3e0; color: #e65100; }
+      .badge.both { background: #f3e5f5; color: #7b1fa2; }
+      .available { color: #2e7d32; }
+      .unavailable { color: #c62828; }
+    </style>
+  </head>
+  <body>
+    <h1>Product Changes Stream</h1>
+    <p class="subtitle">Realtime price and availability updates via SSE</p>
+    <span id="status" class="status disconnected">Connecting...</span>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Product</th>
+          <th>Provider</th>
+          <th>Price</th>
+          <th>Availability</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody id="changes-body">
+        <tr><td colspan="6" class="empty">Waiting for changes...</td></tr>
+      </tbody>
+    </table>
+
+    <script>
+      const MAX_ROWS = 100;
+      const tableBody = document.getElementById('changes-body');
+      const statusEl = document.getElementById('status');
+      let isEmpty = true;
+
+      const eventSource = new EventSource('/api/v1/streams/products');
+
+      eventSource.addEventListener('open', () => {
+        statusEl.textContent = 'Connected';
+        statusEl.className = 'status connected';
+      });
+
+      eventSource.addEventListener('product-change', (event) => {
+        const c = JSON.parse(event.data);
+
+        if (isEmpty) {
+          tableBody.innerHTML = '';
+          isEmpty = false;
+        }
+
+        const row = document.createElement('tr');
+        const availClass = c.availability ? 'available' : 'unavailable';
+        const badgeClass = c.changeType === 'BOTH' ? 'both' : c.changeType === 'PRICE_CHANGE' ? 'price' : 'availability';
+
+        row.innerHTML =
+          '<td>' + new Date(c.changedAt).toLocaleTimeString() + '</td>' +
+          '<td>' + c.productName + '</td>' +
+          '<td>' + c.providerName + '</td>' +
+          '<td>' + c.oldPrice + ' &rarr; ' + c.price + ' ' + c.currency + '</td>' +
+          '<td><span class="' + availClass + '">' + c.oldAvailability + ' &rarr; ' + c.availability + '</span></td>' +
+          '<td><span class="badge ' + badgeClass + '">' + c.changeType.replace('_', ' ') + '</span></td>';
+
+        tableBody.prepend(row);
+
+        while (tableBody.children.length > MAX_ROWS) {
+          tableBody.removeChild(tableBody.lastChild);
+        }
+      });
+
+      eventSource.addEventListener('error', () => {
+        statusEl.textContent = 'Disconnected';
+        statusEl.className = 'status disconnected';
+      });
+    </script>
+  </body>
+</html>

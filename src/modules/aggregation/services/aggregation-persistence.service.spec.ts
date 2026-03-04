@@ -1,6 +1,7 @@
 import { ChangeType, Currency, Prisma } from '.prisma/client';
 import { ProviderName } from '@core/enums';
 import { PrismaService } from '@modules/database/prisma.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import type { NormalizedProviderProduct } from '@modules/providers/interfaces';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getLoggerToken } from 'nestjs-pino';
@@ -10,6 +11,7 @@ import {
   type MockProductsPrismaService,
   type MockProductsPrismaTransactionClient,
 } from '../../../../test/helpers/products-prisma.helper';
+import { AggregationEvent } from '../events';
 import { AggregationPersistenceService } from './aggregation-persistence.service';
 
 describe('AggregationPersistenceService', () => {
@@ -20,6 +22,9 @@ describe('AggregationPersistenceService', () => {
   let logger: {
     error: jest.Mock;
     warn: jest.Mock;
+  };
+  let eventEmitter: {
+    emit: jest.Mock;
   };
 
   const normalizedItem: NormalizedProviderProduct = {
@@ -42,6 +47,9 @@ describe('AggregationPersistenceService', () => {
       error: jest.fn(),
       warn: jest.fn(),
     };
+    eventEmitter = {
+      emit: jest.fn(),
+    };
 
     prismaService.$transaction.mockImplementation(
       async (callback: (client: typeof tx) => unknown) => callback(tx),
@@ -57,6 +65,10 @@ describe('AggregationPersistenceService', () => {
         {
           provide: getLoggerToken(AggregationPersistenceService.name),
           useValue: logger,
+        },
+        {
+          provide: EventEmitter2,
+          useValue: eventEmitter,
         },
       ],
     })
@@ -95,6 +107,7 @@ describe('AggregationPersistenceService', () => {
   afterEach(() => {
     logger.error.mockReset();
     logger.warn.mockReset();
+    eventEmitter.emit.mockReset();
   });
 
   afterAll(async () => {
@@ -126,6 +139,7 @@ describe('AggregationPersistenceService', () => {
         }),
       }),
     );
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
   });
 
   it('stores history before updating an existing provider product when price or availability changes', async () => {
@@ -156,6 +170,19 @@ describe('AggregationPersistenceService', () => {
           availability: true,
           isStale: false,
         }),
+      }),
+    );
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      AggregationEvent.PRODUCT_CHANGE,
+      expect.objectContaining({
+        productId: 10,
+        providerName: normalizedItem.providerName,
+        externalId: normalizedItem.externalId,
+        price: normalizedItem.price,
+        oldPrice: '59.99',
+        availability: true,
+        oldAvailability: false,
+        changeType: ChangeType.BOTH,
       }),
     );
   });
@@ -199,6 +226,19 @@ describe('AggregationPersistenceService', () => {
         }),
       }),
     );
+  });
+
+  it('does not emit a product change event when the current values are unchanged', async () => {
+    tx.providerProduct.findUnique.mockResolvedValue({
+      id: 100,
+      price: new Prisma.Decimal('79.99'),
+      availability: true,
+    });
+
+    await service.persistItem(normalizedItem);
+
+    expect(tx.providerProductHistory.create).not.toHaveBeenCalled();
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
   });
 
   it('marks stale provider products using fetchedAt', async () => {
