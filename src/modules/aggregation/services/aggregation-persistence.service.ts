@@ -2,8 +2,10 @@ import { ChangeType, Currency, type Product, type Provider } from '.prisma/clien
 import { PrismaService } from '@modules/database/prisma.service';
 import type { NormalizedProviderProduct } from '@modules/providers/interfaces';
 import { Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Decimal } from '@prisma/client/runtime/client';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import { AggregationEvent, type AggregationEventPayload } from '../events';
 
 @Injectable()
 export class AggregationPersistenceService {
@@ -11,6 +13,7 @@ export class AggregationPersistenceService {
 
   constructor(
     private readonly prismaService: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
     @InjectPinoLogger(AggregationPersistenceService.name)
     private readonly logger: PinoLogger,
   ) {}
@@ -43,7 +46,7 @@ export class AggregationPersistenceService {
       this.upsertProduct(item),
     ]);
 
-    await this.prismaService.$transaction(async (tx) => {
+    const changePayload = await this.prismaService.$transaction(async (tx) => {
       const existingProviderProduct = await tx.providerProduct.findUnique({
         where: {
           providerId_externalId: {
@@ -81,13 +84,16 @@ export class AggregationPersistenceService {
           },
         });
 
-        return;
+        return null;
       }
 
       const priceChanged = !existingProviderProduct.price.equals(price);
       const availabilityChanged = existingProviderProduct.availability !== item.availability;
+      let payload: AggregationEventPayload<AggregationEvent.PRODUCT_CHANGE> | null = null;
 
       if (priceChanged || availabilityChanged) {
+        const changeType = this.resolveChangeType(priceChanged, availabilityChanged);
+
         await tx.providerProductHistory.create({
           data: {
             providerProductId: existingProviderProduct.id,
@@ -96,10 +102,25 @@ export class AggregationPersistenceService {
             currency,
             availability: item.availability,
             oldAvailability: existingProviderProduct.availability,
-            changeType: this.resolveChangeType(priceChanged, availabilityChanged),
+            changeType,
             changedAt: now,
           },
         });
+
+        payload = {
+          productId: product.id,
+          productName: product.name,
+          canonicalKey: product.canonicalKey,
+          providerName: provider.name,
+          externalId: item.externalId,
+          price: item.price,
+          oldPrice: existingProviderProduct.price.toString(),
+          currency,
+          availability: item.availability,
+          oldAvailability: existingProviderProduct.availability,
+          changeType,
+          changedAt: now,
+        };
       }
 
       await tx.providerProduct.update({
@@ -114,7 +135,13 @@ export class AggregationPersistenceService {
           isStale: false,
         },
       });
+
+      return payload;
     });
+
+    if (changePayload) {
+      this.eventEmitter.emit(AggregationEvent.PRODUCT_CHANGE, changePayload);
+    }
   }
 
   async markStaleProducts(staleThresholdMs: number): Promise<number> {

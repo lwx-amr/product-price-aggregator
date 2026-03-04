@@ -38,6 +38,7 @@ services:
       - ./prisma:/app/prisma
       - ./tsconfig.json:/app/tsconfig.json
       - ./tsconfig.build.json:/app/tsconfig.build.json
+      - ./public:/app/public
       - ./nest-cli.json:/app/nest-cli.json
       - ./package.json:/app/package.json
       - ./yarn.lock:/app/yarn.lock

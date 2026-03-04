@@ -10,10 +10,12 @@ import { HealthModule } from '@modules/health/health.module';
 import { ProductsModule } from '@modules/products/products.module';
 import { ProvidersModule } from '@modules/providers/providers.module';
 import { SimulatedProvidersModule } from '@modules/simulated-providers/simulated-providers.module';
+import { StreamsModule } from '@modules/streams/streams.module';
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
@@ -28,6 +30,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
       inject: [ConfigService],
       useFactory: (config: ConfigService<Environment, true>) => buildPinoOptions(config),
     }),
+    EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
@@ -40,6 +43,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     SimulatedProvidersModule,
     AggregationModule,
     ProductsModule,
+    StreamsModule,
   ],
   providers: [
     {
