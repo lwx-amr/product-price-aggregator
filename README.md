@@ -53,7 +53,21 @@ yarn start:dev
 
 The app will be running on `http://localhost:3398`.
 
-### Docker Scripts
+### Tests
+
+Run the unit tests:
+
+```bash
+yarn test
+```
+
+Run the HTTP integration tests for the product endpoints:
+
+```bash
+yarn test:e2e
+```
+
+### Docker and Prisma Scripts
 
 | Script                 | What it does                       |
 | ---------------------- | ---------------------------------- |
