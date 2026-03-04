@@ -1,12 +1,18 @@
+import { SwaggerApiPaginatedQuery } from '@core/decorators';
+import { PageMetaDto } from '@core/dtos';
 import { ResponseFactory } from '@core/factories';
 import type { DataPageResponse, DataResponse } from '@core/interfaces';
+import { dataResponseSchema, paginatedResponseSchema } from '@core/swagger';
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
+  ApiExtraModels,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiSecurity,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import {
   ChangeResponseDto,
@@ -17,6 +23,7 @@ import {
 } from './dto';
 import { ProductsService } from './products.service';
 
+@ApiExtraModels(PageMetaDto, ProductResponseDto, ProductDetailResponseDto, ChangeResponseDto)
 @ApiTags('Products')
 @ApiSecurity('api-key')
 @Controller('products')
@@ -24,12 +31,14 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  @ApiOperation({
-    summary: 'Get aggregated products with current offers',
-  })
+  @ApiOperation({ summary: 'Get aggregated products with current offers' })
+  @SwaggerApiPaginatedQuery()
   @ApiOkResponse({
     description: 'Paginated list of canonical products and their matching offers.',
+    schema: paginatedResponseSchema(ProductResponseDto),
   })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid API key.' })
+  @ApiBadRequestResponse({ description: 'Invalid query parameters.' })
   async findAll(
     @Query() query: GetProductsQueryDto,
   ): Promise<DataPageResponse<ProductResponseDto>> {
@@ -42,12 +51,14 @@ export class ProductsController {
   }
 
   @Get('changes')
-  @ApiOperation({
-    summary: 'Get recent price and availability changes',
-  })
+  @ApiOperation({ summary: 'Get recent price and availability changes' })
+  @SwaggerApiPaginatedQuery()
   @ApiOkResponse({
     description: 'Paginated list of recent product changes.',
+    schema: paginatedResponseSchema(ChangeResponseDto),
   })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid API key.' })
+  @ApiBadRequestResponse({ description: 'Invalid timeframe or pagination parameters.' })
   async getChanges(
     @Query() query: GetChangesQueryDto,
   ): Promise<DataPageResponse<ChangeResponseDto>> {
@@ -60,15 +71,14 @@ export class ProductsController {
   }
 
   @Get(':id')
-  @ApiOperation({
-    summary: 'Get a product with current offers and recent history',
-  })
+  @ApiOperation({ summary: 'Get a product with current offers and recent history' })
   @ApiOkResponse({
     description: 'Detailed canonical product view with all provider offers.',
+    schema: dataResponseSchema(ProductDetailResponseDto),
   })
-  @ApiNotFoundResponse({
-    description: 'Product was not found.',
-  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid API key.' })
+  @ApiBadRequestResponse({ description: 'Product id must be a valid number.' })
+  @ApiNotFoundResponse({ description: 'Product was not found.' })
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<DataResponse<ProductDetailResponseDto>> {

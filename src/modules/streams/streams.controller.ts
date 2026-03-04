@@ -39,7 +39,7 @@ export class StreamsController {
   @ApiProduces('text/event-stream')
   @ApiOkResponse({
     description:
-      'Server-Sent Events stream with product change notifications and heartbeat events.',
+      'Server-Sent Events stream with `product-change` events for price or availability updates and `heartbeat` events every 30 seconds.',
   })
   products(): Observable<MessageEvent> {
     this.logger.info({ stream: 'products' }, 'Opened SSE stream');
